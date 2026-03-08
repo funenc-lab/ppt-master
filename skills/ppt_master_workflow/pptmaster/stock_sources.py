@@ -11,6 +11,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Callable, Dict, List, Optional, Sequence, Tuple
 
+from .image_source_metadata import write_stock_image_metadata
+
 MANIFEST_VERSION = 1
 DEFAULT_STOCK_DIRNAME = "stock"
 STOCK_ROOT_ENV = "PPTMASTER_STOCK_ROOT_DIR"
@@ -571,6 +573,19 @@ def register_stock_image(request: RegisterStockRequest) -> Tuple[StockImageRecor
         notes=request.notes,
     )
     manifest = upsert_record(request.project_dir, record)
+    write_stock_image_metadata(
+        request.project_dir / record.local_path,
+        provider=record.source_provider,
+        origin_url=record.source_url,
+        asset_id=record.source_id,
+        license_name=record.license_name,
+        license_url=record.license_url,
+        creator_name=record.creator_name,
+        creator_url=record.creator_url,
+        local_path=record.local_path,
+        notes=record.notes,
+        tags=record.keywords,
+    )
     return record, manifest
 
 
@@ -603,6 +618,19 @@ def download_and_register_stock_image(request: DownloadStockRequest) -> Tuple[Pa
         notes=request.notes,
     )
     manifest = upsert_record(request.project_dir, record)
+    write_stock_image_metadata(
+        downloaded_file,
+        provider=record.source_provider,
+        origin_url=record.source_url,
+        asset_id=record.source_id,
+        license_name=record.license_name,
+        license_url=record.license_url,
+        creator_name=record.creator_name,
+        creator_url=record.creator_url,
+        local_path=record.local_path,
+        notes=record.notes,
+        tags=record.keywords,
+    )
     return downloaded_file, record, manifest
 
 

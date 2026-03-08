@@ -55,6 +55,10 @@ class RegisterStockImageCliTestCase(unittest.TestCase):
             self.assertEqual(len(manifest["images"]), 1)
             self.assertEqual(manifest["images"][0]["filename"], "hero.jpg")
             self.assertEqual(manifest["images"][0]["creator_name"], "Jane Doe")
+            sidecar = project_dir / "images" / "stock" / "hero.jpg.source.json"
+            self.assertTrue(sidecar.exists())
+            metadata = json.loads(sidecar.read_text(encoding="utf-8"))
+            self.assertEqual(metadata["provider"], "unsplash")
 
 
 if __name__ == "__main__":

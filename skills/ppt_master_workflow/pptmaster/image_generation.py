@@ -8,6 +8,7 @@ import importlib.util
 import os
 import time
 from dataclasses import dataclass
+from .image_source_metadata import write_generated_image_metadata
 from pathlib import Path
 from typing import Any, Callable, Dict, Optional
 
@@ -714,6 +715,14 @@ def generate_image(
     for attempt in range(max_retries + 1):
         try:
             path = handler(config, normalized_request)
+            write_generated_image_metadata(
+                path,
+                provider=config.provider,
+                model=config.model,
+                prompt=normalized_request.prompt,
+                negative_prompt=normalized_request.negative_prompt,
+                local_path=str(path),
+            )
             return ImageGenerationResult(path=path, provider=config.provider, model=config.model)
         except Exception as error:
             last_error = error

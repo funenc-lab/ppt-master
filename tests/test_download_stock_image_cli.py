@@ -72,6 +72,10 @@ class DownloadStockImageCliTestCase(unittest.TestCase):
             self.assertEqual(record["download_url"], download_url)
             self.assertEqual(record["creator_name"], "Demo Creator")
             self.assertEqual(record["keywords"], ["hero", "blue"])
+            sidecar = project_dir / "images" / "stock" / "cover.png.source.json"
+            self.assertTrue(sidecar.exists())
+            metadata = json.loads(sidecar.read_text(encoding="utf-8"))
+            self.assertEqual(metadata["provider"], "pexels")
             self.assertEqual(outputs, [
                 f"Downloaded stock image: {downloaded}",
                 f"Manifest updated: {manifest_file}",

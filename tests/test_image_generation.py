@@ -23,6 +23,7 @@ from pptmaster.image_generation import (
     provider_sdk_dependency_status,
     resolve_provider_config,
 )
+from pptmaster.image_source_metadata import build_sidecar_path, read_source_metadata
 
 PNG_BYTES = base64.b64decode(
     "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGNgYAAAAAIAAeIhvDMAAAAASUVORK5CYII="
@@ -219,6 +220,11 @@ class ImageGenerationTestCase(unittest.TestCase):
                 self.assertEqual(captured["kwargs"]["stream"], False)
                 mocked_get.assert_called_once_with("https://cdn.example/generated.png", timeout=config.timeout_seconds)
                 self.assertEqual(result.path.read_bytes(), PNG_BYTES)
+                sidecar = build_sidecar_path(result.path)
+                metadata = read_source_metadata(result.path)
+                self.assertTrue(sidecar.exists())
+                self.assertIsNotNone(metadata)
+                self.assertEqual(metadata.provider, "doubao")
 
     def test_generate_image_uses_openai_sdk(self):
         captured = {}
@@ -262,6 +268,9 @@ class ImageGenerationTestCase(unittest.TestCase):
             self.assertEqual(captured["kwargs"]["model"], DEFAULT_MODELS["openai-compatible"])
             self.assertEqual(captured["kwargs"]["size"], "1024x576")
             self.assertEqual(result.path.read_bytes(), PNG_BYTES)
+            metadata = read_source_metadata(result.path)
+            self.assertIsNotNone(metadata)
+            self.assertEqual(metadata.provider, "openai-compatible")
 
 
 if __name__ == "__main__":
