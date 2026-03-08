@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "name": "ocr-image-to-markdown",
   "display_name": "OCR Image to Markdown",
   "description": "Use when the source material is a screenshot, scanned page, image-only document, table snapshot, slide image, or other visual content that must be transcribed into Markdown before further processing, especially when no command-based OCR path is available or when a workflow needs a multimodal fallback for image-based source ingestion.",
@@ -9,11 +9,49 @@
   "language": "en",
   "kind": "fallback-skill",
   "canonical": false,
+  "scope_paths": [
+    ".agent/skills/ocr_image_to_markdown"
+  ],
+  "activation": {
+    "triggers": [
+      "A screenshot, scan, or image-only document must be turned into Markdown",
+      "Command-based OCR is unavailable or unsuitable",
+      "The PPT workflow is blocked at source normalization because the source is image-based"
+    ],
+    "do_not_use_when": [
+      "The source is already normal text, Markdown, HTML, or a standard PDF that a canonical converter can process",
+      "The task only needs a high-level visual summary instead of Markdown transcription"
+    ]
+  },
   "entrypoints": {
     "skill": "SKILL.md"
   },
-  "integrates_with_skills": [
-    "ppt-master-workflow"
+  "capabilities": [
+    "Transcribe image-based source material into structured Markdown",
+    "Preserve headings, lists, tables, and reading order",
+    "Act as a multimodal fallback for workflow source ingestion",
+    "Prepare project-local Markdown handoff artifacts for downstream workflow stages"
+  ],
+  "constraints": [
+    "Do not invent text that is not visible in the source image",
+    "Do not flatten recoverable structure into plain paragraphs",
+    "Mark uncertainty explicitly when parts of the image are unreadable"
+  ],
+  "dependencies": {
+    "skills": [
+      "ppt-master-workflow"
+    ],
+    "files": [
+      ".agent/skills/ocr_image_to_markdown/SKILL.md",
+      "skills/ppt_master_workflow/SKILL.md",
+      "skills/ppt_master_workflow/AGENTS.md"
+    ]
+  },
+  "references": [
+    ".agent/skills/ocr_image_to_markdown/SKILL.md",
+    "skills/ppt_master_workflow/SKILL.md",
+    "skills/ppt_master_workflow/AGENTS.md",
+    "skills/ppt_master_workflow/docs/ppt_workflow_operator_manual.md"
   ],
   "tags": [
     "ocr",

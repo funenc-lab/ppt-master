@@ -7,6 +7,7 @@ imports from ``pptmaster.*``.
 
 __all__ = [
     "batch_validation",
+    "asset_policy",
     "config",
     "command_bridge",
     "error_helper",
@@ -19,6 +20,7 @@ __all__ = [
     "pdf_markdown",
     "image_analysis",
     "image_generation",
+    "image_source_metadata",
     "image_rotation",
     "notes_splitter",
     "stock_sources",
@@ -38,4 +40,5 @@ __all__ = [
     "svg_asset_cli",
     "svg_positioning",
     "watermark_removal",
+    "watermark_detection",
 ]
