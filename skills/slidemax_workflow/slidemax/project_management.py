@@ -64,6 +64,15 @@ class PreflightCheck:
     message: str
 
 
+def _find_svg_files(project_path: Path, directory_name: str) -> List[Path]:
+    """Return SVG files from a project subdirectory."""
+
+    svg_dir = project_path / directory_name
+    if not svg_dir.exists():
+        return []
+    return sorted(svg_dir.glob('*.svg'))
+
+
 class ProjectManager:
     """Create, validate, and inspect SlideMax projects."""
 
@@ -132,14 +141,16 @@ class ProjectManager:
         is_valid, errors, warnings = validate_project_structure(str(project_path_obj))
         svg_files = _find_svg_output_files(project_path_obj)
 
-        if project_path_obj.exists() and project_path_obj.is_dir() and svg_files:
+        if project_path_obj.exists() and project_path_obj.is_dir():
             info = get_project_info_common(str(project_path_obj))
             expected_format = info.get('format')
             if expected_format == 'unknown':
                 expected_format = None
-            warnings.extend(validate_svg_viewbox(svg_files, expected_format))
-
-            delivery_errors, delivery_warnings = _collect_delivery_errors(project_path_obj, svg_files)
+            delivery_errors, delivery_warnings = _collect_delivery_errors(
+                project_path_obj,
+                svg_files,
+                expected_format=expected_format,
+            )
             errors.extend(delivery_errors)
             warnings.extend(delivery_warnings)
 
@@ -182,6 +193,13 @@ def _collect_notes_check(project_path: Path) -> PreflightCheck:
     split_notes = [path for path in notes_dir.glob('*.md') if path.name != 'total.md'] if notes_dir.exists() else []
     split_stems = {path.stem for path in split_notes}
 
+    if not svg_stems:
+        return PreflightCheck(
+            name='notes_status',
+            status='ok',
+            message='No slide SVG files exist yet; notes coverage check is not applicable.',
+        )
+
     if total_md_path.exists() and svg_stems and not split_notes:
         return PreflightCheck(
             name='notes_status',
@@ -216,8 +234,8 @@ def _collect_template_check(project_path: Path) -> PreflightCheck:
     if not template_svgs:
         return PreflightCheck(
             name='template_svg_quality',
-            status='warning',
-            message='No template SVG files were found under templates/.',
+            status='ok',
+            message='No template SVG files were found under templates/; skipping template validation.',
         )
 
     checker = SVGQualityChecker()
@@ -244,10 +262,19 @@ def _collect_template_check(project_path: Path) -> PreflightCheck:
 def _find_svg_output_files(project_path: Path) -> List[Path]:
     """Return current raw SVG slides for validation flows."""
 
-    svg_output_dir = project_path / 'svg_output'
-    if not svg_output_dir.exists():
+    return _find_svg_files(project_path, 'svg_output')
+
+
+def _collect_delivery_slide_errors(project_path: Path, svg_files: List[Path]) -> List[str]:
+    """Validate that raw slide SVG output exists before delivery checks continue."""
+
+    if not (project_path / 'svg_output').exists():
         return []
-    return sorted(svg_output_dir.glob('*.svg'))
+
+    if svg_files:
+        return []
+
+    return ['No SVG slides were found under svg_output/. Generate slide SVG files before delivery validation.']
 
 
 def _collect_delivery_notes_result(project_path: Path, svg_files: List[Path]) -> Tuple[List[str], List[str]]:
@@ -267,11 +294,11 @@ def _collect_delivery_notes_result(project_path: Path, svg_files: List[Path]) ->
         parsed_notes = parse_total_md(total_md_path, [svg_path.stem for svg_path in svg_files], False)
         missing_from_total = [svg_path.stem for svg_path in svg_files if svg_path.stem not in parsed_notes]
         if not missing_from_total:
-            warnings.append(
+            return [
                 'Speaker notes are only present in notes/total.md. '
-                'Run total_md_split.py before delivery for explicit per-slide note files.'
-            )
-            return [], warnings
+                'Run `python3 skills/slidemax_workflow/scripts/slidemax.py total_md_split <project-path>` '
+                'to generate explicit per-slide note files before delivery.'
+            ], warnings
 
     return [
         'Missing speaker notes for slide(s): '
@@ -280,7 +307,12 @@ def _collect_delivery_notes_result(project_path: Path, svg_files: List[Path]) ->
     ], warnings
 
 
-def _collect_delivery_svg_final_errors(project_path: Path, svg_files: List[Path]) -> List[str]:
+def _collect_delivery_svg_final_errors(
+    project_path: Path,
+    svg_files: List[Path],
+    *,
+    expected_format: Optional[str],
+) -> List[str]:
     """Validate that finalized SVG output exists for every current slide."""
 
     if not svg_files:
@@ -292,13 +324,18 @@ def _collect_delivery_svg_final_errors(project_path: Path, svg_files: List[Path]
 
     finalized_stems = {svg_path.stem for svg_path in svg_final_dir.glob('*.svg')}
     missing_stems = [svg_path.stem for svg_path in svg_files if svg_path.stem not in finalized_stems]
-    if not missing_stems:
+    if missing_stems:
+        return [
+            'Missing finalized SVG file(s) under svg_final/: '
+            + ', '.join(f'{stem}.svg' for stem in missing_stems)
+        ]
+
+    current_finalized_files = [svg_final_dir / f'{svg_path.stem}.svg' for svg_path in svg_files]
+    viewbox_warnings = validate_svg_viewbox(current_finalized_files, expected_format)
+    if not viewbox_warnings:
         return []
 
-    return [
-        'Missing finalized SVG file(s) under svg_final/: '
-        + ', '.join(f'{stem}.svg' for stem in missing_stems)
-    ]
+    return [f'Finalized SVG validation failed: {warning}' for warning in viewbox_warnings]
 
 
 def _collect_delivery_pptx_errors(project_path: Path, svg_files: List[Path]) -> List[str]:
@@ -314,18 +351,70 @@ def _collect_delivery_pptx_errors(project_path: Path, svg_files: List[Path]) -> 
     return ['Missing exported PPTX file (*.pptx) in the project root.']
 
 
-def _collect_delivery_errors(project_path: Path, svg_files: List[Path]) -> Tuple[List[str], List[str]]:
+def _collect_delivery_errors(
+    project_path: Path,
+    svg_files: List[Path],
+    *,
+    expected_format: Optional[str],
+) -> Tuple[List[str], List[str]]:
     """Collect strict delivery validation results for `validate`."""
 
     errors: List[str] = []
     warnings: List[str] = []
 
+    errors.extend(_collect_delivery_slide_errors(project_path, svg_files))
     note_errors, note_warnings = _collect_delivery_notes_result(project_path, svg_files)
     errors.extend(note_errors)
     warnings.extend(note_warnings)
-    errors.extend(_collect_delivery_svg_final_errors(project_path, svg_files))
+    errors.extend(
+        _collect_delivery_svg_final_errors(
+            project_path,
+            svg_files,
+            expected_format=expected_format,
+        )
+    )
     errors.extend(_collect_delivery_pptx_errors(project_path, svg_files))
     return errors, warnings
+
+
+def _collect_preflight_project_structure_check(project_path: Path) -> PreflightCheck:
+    """Validate only the project skeleton needed for preflight flows."""
+
+    if not project_path.exists():
+        return PreflightCheck(
+            name='project_structure',
+            status='error',
+            message=f'Project path does not exist: {project_path}',
+        )
+
+    if not project_path.is_dir():
+        return PreflightCheck(
+            name='project_structure',
+            status='error',
+            message=f'Project path is not a directory: {project_path}',
+        )
+
+    required_paths = [
+        project_path / 'README.md',
+        project_path / 'svg_output',
+        project_path / 'svg_final',
+        project_path / 'images',
+        project_path / 'notes',
+        project_path / 'templates',
+    ]
+    missing_paths = [path.name for path in required_paths if not path.exists()]
+    if missing_paths:
+        return PreflightCheck(
+            name='project_structure',
+            status='error',
+            message='Missing required project path(s): ' + ', '.join(missing_paths),
+        )
+
+    return PreflightCheck(
+        name='project_structure',
+        status='ok',
+        message='Project structure looks complete.',
+    )
 
 
 def build_preflight_checks(
@@ -420,15 +509,7 @@ def build_preflight_checks(
         return checks
 
     project_path_obj = Path(project_path)
-    is_valid, errors, warnings = validate_project_structure(str(project_path_obj))
-    if not is_valid:
-        message = errors[0] if errors else 'Project structure is invalid.'
-        checks.append(PreflightCheck(name='project_structure', status='error', message=message))
-    elif warnings:
-        checks.append(PreflightCheck(name='project_structure', status='warning', message=warnings[0]))
-    else:
-        checks.append(PreflightCheck(name='project_structure', status='ok', message='Project structure looks complete.'))
-
+    checks.append(_collect_preflight_project_structure_check(project_path_obj))
     checks.append(_collect_template_check(project_path_obj))
     checks.append(_collect_notes_check(project_path_obj))
 

@@ -200,6 +200,26 @@ class ProjectManagementTestCase(unittest.TestCase):
         self.assertEqual(payload["project_path"], str(project))
         self.assertTrue(any(check["name"] == "project_structure" for check in payload["checks"]))
 
+    def test_run_cli_doctor_treats_optional_templates_and_notes_as_not_applicable_before_slides_exist(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            project = Path(tmp) / "demo_ppt169_20260308"
+            (project / "svg_output").mkdir(parents=True)
+            (project / "svg_final").mkdir()
+            (project / "images").mkdir()
+            (project / "templates").mkdir()
+            (project / "notes").mkdir()
+            (project / "README.md").write_text("# demo\n", encoding="utf-8")
+
+            stdout = io.StringIO()
+            with redirect_stdout(stdout):
+                exit_code = run_cli(["doctor", str(project)])
+
+        self.assertEqual(exit_code, 0)
+        output = stdout.getvalue()
+        self.assertIn("project_structure: ok", output)
+        self.assertIn("template_svg_quality: ok", output)
+        self.assertIn("notes_status: ok", output)
+
     def test_run_cli_validate_fails_when_finalized_svg_missing(self):
         with tempfile.TemporaryDirectory() as tmp:
             project = self._create_delivery_ready_project(Path(tmp))
@@ -223,6 +243,52 @@ class ProjectManagementTestCase(unittest.TestCase):
 
         self.assertEqual(exit_code, 1)
         self.assertIn(".pptx", stdout.getvalue())
+
+    def test_run_cli_validate_fails_when_no_svg_slides_exist(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            project = Path(tmp) / "demo_ppt169_20260308"
+            (project / "svg_output").mkdir(parents=True)
+            (project / "svg_final").mkdir()
+            (project / "images").mkdir()
+            (project / "templates").mkdir()
+            (project / "notes").mkdir()
+            (project / "README.md").write_text("# demo\n", encoding="utf-8")
+            (project / "design_specification.md").write_text("# spec\n", encoding="utf-8")
+
+            stdout = io.StringIO()
+            with redirect_stdout(stdout):
+                exit_code = run_cli(["validate", str(project)])
+
+        self.assertEqual(exit_code, 1)
+        self.assertIn("No SVG slides", stdout.getvalue())
+
+    def test_run_cli_validate_fails_when_only_total_notes_exist(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            project = self._create_delivery_ready_project(Path(tmp))
+            (project / "notes" / "01_封面.md").unlink()
+            (project / "notes" / "total.md").write_text("## 01 封面\nhello\n", encoding="utf-8")
+
+            stdout = io.StringIO()
+            with redirect_stdout(stdout):
+                exit_code = run_cli(["validate", str(project)])
+
+        self.assertEqual(exit_code, 1)
+        self.assertIn("total_md_split", stdout.getvalue())
+
+    def test_run_cli_validate_fails_when_finalized_svg_viewbox_is_invalid(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            project = self._create_delivery_ready_project(Path(tmp))
+            (project / "svg_final" / "01_封面.svg").write_text(
+                '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1"></svg>',
+                encoding="utf-8",
+            )
+
+            stdout = io.StringIO()
+            with redirect_stdout(stdout):
+                exit_code = run_cli(["validate", str(project)])
+
+        self.assertEqual(exit_code, 1)
+        self.assertIn("viewBox", stdout.getvalue())
 
     def test_run_cli_validate_fails_when_slide_notes_are_incomplete(self):
         with tempfile.TemporaryDirectory() as tmp:
