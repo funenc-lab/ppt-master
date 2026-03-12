@@ -758,7 +758,21 @@ def process_targets(
 def build_parser() -> argparse.ArgumentParser:
     """Build the CLI parser for the Python web-to-Markdown converter."""
 
-    parser = argparse.ArgumentParser(description='Web to Markdown Converter (Python)')
+    parser = argparse.ArgumentParser(
+        prog='python3 skills/slidemax_workflow/scripts/slidemax.py web_to_md',
+        description='Web to Markdown Converter (Python)',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog='''
+When to use:
+  - Use this for standard web pages that do not require the Node fallback
+  - Use `-f` when processing many URLs from a prepared list
+
+Examples:
+  %(prog)s https://example.com/article
+  %(prog)s https://example.com/article -o article.md
+  %(prog)s -f urls.txt -d output
+''',
+    )
     parser.add_argument('urls', nargs='*', help='URLs to process')
     parser.add_argument('-f', '--file', help='File containing URLs (one per line)')
     parser.add_argument('-o', '--output', help='Output file (single URL only)')

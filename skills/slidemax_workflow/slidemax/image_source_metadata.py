@@ -341,7 +341,21 @@ def write_stock_image_metadata(
 def build_parser() -> argparse.ArgumentParser:
     """Build the CLI parser for manual source metadata registration."""
 
-    parser = argparse.ArgumentParser(description="Register or inspect image source metadata sidecars.")
+    parser = argparse.ArgumentParser(
+        prog='python3 skills/slidemax_workflow/scripts/slidemax.py register_image_source',
+        description="Register or inspect image source metadata sidecars.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog='''
+When to use:
+  - Register provenance for generated, stock, or user-supplied images before delivery
+  - Use `--show` to inspect the current sidecar without rewriting it
+
+Examples:
+  %(prog)s workspace/demo/images/hero.png --source-type generated --provider gemini --prompt "Minimal business background"
+  %(prog)s workspace/demo/images/hero.png --show
+  %(prog)s workspace/demo/images/hero.png --show --json
+''',
+    )
     parser.add_argument("image_path", type=Path, help="Image file path.")
     parser.add_argument("--show", action="store_true", help="Print metadata instead of writing it.")
     parser.add_argument("--json", action="store_true", help="Print JSON output.")

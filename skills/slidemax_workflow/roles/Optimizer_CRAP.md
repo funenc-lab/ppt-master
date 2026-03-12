@@ -57,9 +57,9 @@ The Optimizer stage should leave the workflow with:
 | 模式 | 触发方式 | 说明 |
 |------|----------|------|
 | **独立使用** | 提供 SVG 文件/代码 | 对任意 SVG 进行视觉优化 |
-| **流程中使用** | `generate-ppt` 后可选优化 | 优化 Executor 生成的 SVG |
+| **流程中使用** | Optional optimization after the first draft | 优化 Executor 生成的 SVG |
 
-> ⏭️ **流程中下一步**：后处理 + 导出 PPTX
+> Next workflow step: re-run the Stage 7 delivery path after optimizer edits.
 
 ## 工作流程
 

@@ -43,9 +43,9 @@ DEFAULT_PROVIDER = "gemini"
 DEFAULT_TIMEOUT_SECONDS = 180
 
 IMAGE_REQUIREMENTS_PATH = "requirements.txt"
-IMAGE_SETUP_DOC_PATH = "skills/slidemax_workflow/docs/image_generation_setup.md"
-IMAGE_PROVIDER_DOC_PATH = "skills/slidemax_workflow/docs/image_generation_providers.md"
-AI_SETUP_PROMPTS_DOC_PATH = "skills/slidemax_workflow/docs/ai_setup_prompts.md"
+IMAGE_SETUP_DOC_PATH = "skills/slidemax_workflow/references/docs/image_generation_setup.md"
+IMAGE_PROVIDER_DOC_PATH = "skills/slidemax_workflow/references/docs/image_generation_providers.md"
+AI_SETUP_PROMPTS_DOC_PATH = "skills/slidemax_workflow/references/docs/ai_setup_prompts.md"
 IMAGE_ENV_TEMPLATE_PATH = "skills/slidemax_workflow/examples/config/slidemax_image.env.example"
 
 PROVIDER_RUNTIME_METADATA = {
@@ -180,7 +180,7 @@ def provider_sdk_dependency_status(provider: str) -> tuple[bool, str]:
 def _provider_ai_setup_prompt(provider: str) -> str:
     normalized_provider = normalize_provider(provider)
     doctor_command = (
-        "python3 skills/slidemax_workflow/commands/project_manager.py "
+        "python3 skills/slidemax_workflow/scripts/slidemax.py project_manager "
         f"doctor --provider {normalized_provider}"
     )
     return "\n".join(
@@ -207,7 +207,7 @@ def _provider_setup_hint(provider: str, *, include_sdk_install: bool = False) ->
     lines.append("- Load it in the current shell: source .env.slidemax-image")
     lines.append(
         "- Validate the active provider: "
-        f"python3 skills/slidemax_workflow/commands/project_manager.py doctor --provider {normalized_provider}"
+        f"python3 skills/slidemax_workflow/scripts/slidemax.py project_manager doctor --provider {normalized_provider}"
     )
     lines.append(f"- Review setup details: {IMAGE_SETUP_DOC_PATH}")
     lines.append(f"- Review provider details: {IMAGE_PROVIDER_DOC_PATH}")
@@ -797,6 +797,16 @@ def build_legacy_gemini_parser() -> argparse.ArgumentParser:
         default_provider='gemini',
         default_prompt='Nano Banana',
         include_provider_argument=False,
+        prog='python3 skills/slidemax_workflow/scripts/slidemax.py nano_banana_gen',
+        epilog='''
+When to use:
+  - Use this only when you need the Gemini-only compatibility wrapper
+  - Prefer `image_generate` for the provider-neutral command surface
+
+Examples:
+  %(prog)s "Retro banana mascot" --aspect-ratio 16:9 --image-size 2K
+  %(prog)s "Studio portrait" --output workspace/demo/images --filename banana_hero
+''',
     )
 
 
@@ -820,8 +830,16 @@ def build_parser(
     default_provider: str = DEFAULT_PROVIDER,
     default_prompt: str = "Generate image",
     include_provider_argument: bool = True,
+    prog: Optional[str] = None,
+    epilog: Optional[str] = None,
 ) -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description=description)
+    parser_kwargs = {"description": description}
+    if prog:
+        parser_kwargs["prog"] = prog
+    if epilog:
+        parser_kwargs["epilog"] = epilog
+        parser_kwargs["formatter_class"] = argparse.RawDescriptionHelpFormatter
+    parser = argparse.ArgumentParser(**parser_kwargs)
     parser.add_argument("prompt", nargs="?", default=default_prompt, help="The prompt for image generation.")
     parser.add_argument(
         "--negative-prompt",
@@ -928,8 +946,23 @@ def generate_legacy_gemini(
     return str(generate_image(request, config, max_retries=max_retries).path)
 
 
-def build_smoke_test_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Run a live smoke test against an image provider.")
+def build_smoke_test_parser(*, prog: Optional[str] = None) -> argparse.ArgumentParser:
+    parser_kwargs = {
+        "description": "Run a live smoke test against an image provider.",
+        "formatter_class": argparse.RawDescriptionHelpFormatter,
+        "epilog": """
+When to use:
+  - Run this before relying on a live provider for project delivery
+  - Use the same provider, model, aspect ratio, and output path you expect to use later
+
+Examples:
+  %(prog)s --provider gemini --output workspace/demo/images
+  %(prog)s --provider doubao --model doubao-seedream-5 --output workspace/demo/images --aspect-ratio 16:9
+""",
+    }
+    if prog:
+        parser_kwargs["prog"] = prog
+    parser = argparse.ArgumentParser(**parser_kwargs)
     parser.add_argument("--provider", required=True, help="Provider name.")
     parser.add_argument("--prompt", default="Minimal geometric business background", help="Smoke test prompt.")
     parser.add_argument("--aspect-ratio", "--aspect_ratio", default="16:9", help="Aspect ratio.")

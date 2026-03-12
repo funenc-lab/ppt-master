@@ -53,9 +53,15 @@ def build_parser() -> argparse.ArgumentParser:
     """Build the CLI parser for finalize entrypoints."""
 
     parser = argparse.ArgumentParser(
+        prog="python3 skills/slidemax_workflow/scripts/slidemax.py finalize_svg",
         description="SlideMax - SVG finalize pipeline",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
+When to use:
+  - Run this after SVG generation is complete and before `svg_to_pptx`
+  - Use `--only` when debugging one finalize step in isolation
+  - Use `--dry-run` to preview the pipeline without changing files
+
 Examples:
   %(prog)s workspace/my_project           # Run all steps (default)
   %(prog)s workspace/my_project --only embed-icons fix-rounded
@@ -161,7 +167,7 @@ def finalize_project(
         safe_print("[OK] Finalize complete")
         print()
         print("Next step:")
-        print(f"  python3 skills/slidemax_workflow/commands/svg_to_pptx.py \"{project_dir}\" -s final")
+        print(f"  python3 skills/slidemax_workflow/scripts/slidemax.py svg_to_pptx \"{project_dir}\" -s final")
 
     return True
 
@@ -183,4 +189,3 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
     parser = build_parser()
     args = parser.parse_args(list(argv) if argv is not None else None)
     raise SystemExit(run_cli(args))
-

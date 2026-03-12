@@ -313,10 +313,16 @@ def add_common_generation_arguments(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--timeout", type=int, default=None, help="Optional request timeout override.")
 
 
-def build_parser() -> argparse.ArgumentParser:
+def build_parser(prog: Optional[str] = None, epilog: Optional[str] = None) -> argparse.ArgumentParser:
     """Build the CLI parser for Doubao image-to-video tasks."""
 
-    parser = argparse.ArgumentParser(description="Manage Doubao ARK image-to-video tasks.")
+    parser_kwargs = {"description": "Manage Doubao ARK image-to-video tasks."}
+    if prog:
+        parser_kwargs["prog"] = prog
+    if epilog:
+        parser_kwargs["epilog"] = epilog
+        parser_kwargs["formatter_class"] = argparse.RawDescriptionHelpFormatter
+    parser = argparse.ArgumentParser(**parser_kwargs)
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     create_parser = subparsers.add_parser("create", help="Create a task and print the task id.")

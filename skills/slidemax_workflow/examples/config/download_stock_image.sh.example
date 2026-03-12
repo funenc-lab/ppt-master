@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-python3 skills/slidemax_workflow/commands/download_stock_image.py workspace/demo \
+python3 skills/slidemax_workflow/scripts/slidemax.py download_stock_image workspace/demo \
   --provider pexels \
   --source-url "https://www.pexels.com/photo/example-id/" \
   --download-url "https://images.pexels.com/photos/example.jpeg" \

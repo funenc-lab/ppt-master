@@ -1,17 +1,19 @@
 # Reference Hub
 
-This directory is a stable navigation hub for the `slidemax-workflow` skill.
+This directory is the documentation and reference hub for the `slidemax-workflow` skill.
 
-It is not the source of truth. Edit the canonical files in their original locations under this skill.
+`AGENTS.md` remains the canonical workflow handbook.
+`references/docs/` stores topic-specific reference notes and redirect entries only.
 
 ## Use This Directory For
 
-- `AGENTS.md` - workflow rules and execution constraints
-- `docs/` - canonical workflow documentation
+- `AGENTS.md` - reference directory guide and authority boundary
+- `docs/` - topic-specific reference notes and redirect entries
 - `templates/` - canonical layout, chart, and icon assets
 
 ## Maintenance Rules
 
-- Use this directory as a short navigation layer only.
-- Do not move canonical workflow logic into `references/`.
-- Update source files under `../AGENTS.md`, `../docs/`, and `../templates/`.
+- Keep executable workflow logic and the canonical workflow handbook in `../AGENTS.md`, `../commands/`, and `../slidemax/`.
+- Keep `docs/` limited to topic-specific references or compatibility redirects.
+- Update template and asset sources under `../templates/`.
+- Do not recreate a second top-level `docs/` directory under the skill root.

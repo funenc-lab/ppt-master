@@ -41,9 +41,14 @@ USAGE = dedent(
     SlideMax image orientation helper.
 
     Usage:
-        python3 skills/slidemax_workflow/commands/rotate_images.py auto <images_directory>
-        python3 skills/slidemax_workflow/commands/rotate_images.py gen <images_directory>
-        python3 skills/slidemax_workflow/commands/rotate_images.py fix <fixes.json>
+        python3 skills/slidemax_workflow/scripts/slidemax.py rotate_images auto <images_directory>
+        python3 skills/slidemax_workflow/scripts/slidemax.py rotate_images gen <images_directory>
+        python3 skills/slidemax_workflow/scripts/slidemax.py rotate_images fix <fixes.json>
+
+    When to use:
+        - auto: fix EXIF-driven orientation issues in place for supported formats
+        - gen: generate an HTML review sheet before deciding manual rotations
+        - fix: apply a previously exported fixes.json file
     """
 ).strip()
 
@@ -574,6 +579,9 @@ def run_cli(argv: Optional[Sequence[str]] = None) -> int:
         return 1
 
     command = args[0]
+    if command in {'-h', '--help', 'help'}:
+        print(USAGE)
+        return 0
     rotator = ImageRotator()
 
     if command == 'gen':

@@ -26,22 +26,22 @@
     <g transform="translate(20, 70)" id="g14">
       <g id="g7">
         <path fill="#FAFBFC" stroke="#E5E7EB" stroke-width="1" id="rect5" d="M8,0 H237 A8,8 0 0 1 245,8 V42 A8,8 0 0 1 237,50 H8 A8,8 0 0 1 0,42 V8 A8,8 0 0 1 8,0 Z" />
-        <text x="15" y="22" font-family="monospace" font-size="11" fill="#6366F1" id="text6">project_manager.py</text>
+        <text x="15" y="22" font-family="monospace" font-size="11" fill="#6366F1" id="text6">project_manager</text>
         <text x="15" y="38" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#6B7280" id="text7">项目初始化 · 验证 · 信息查看</text>
       </g>
       <g transform="translate(265, 0)" id="g9">
         <path fill="#FAFBFC" stroke="#E5E7EB" stroke-width="1" id="rect7" d="M8,0 H237 A8,8 0 0 1 245,8 V42 A8,8 0 0 1 237,50 H8 A8,8 0 0 1 0,42 V8 A8,8 0 0 1 8,0 Z" />
-        <text x="15" y="22" font-family="monospace" font-size="11" fill="#6366F1" id="text8">svg_quality_checker.py</text>
+        <text x="15" y="22" font-family="monospace" font-size="11" fill="#6366F1" id="text8">svg_quality_checker</text>
         <text x="15" y="38" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#6B7280" id="text9">SVG 质量检查 · 规范验证</text>
       </g>
       <g transform="translate(0, 60)" id="g11">
         <path fill="#FAFBFC" stroke="#E5E7EB" stroke-width="1" id="rect9" d="M8,0 H237 A8,8 0 0 1 245,8 V42 A8,8 0 0 1 237,50 H8 A8,8 0 0 1 0,42 V8 A8,8 0 0 1 8,0 Z" />
-        <text x="15" y="22" font-family="monospace" font-size="11" fill="#6366F1" id="text10">finalize_svg.py</text>
+        <text x="15" y="22" font-family="monospace" font-size="11" fill="#6366F1" id="text10">finalize_svg</text>
         <text x="15" y="38" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#6B7280" id="text11">最终化处理 · 图标嵌入</text>
       </g>
       <g transform="translate(265, 60)" id="g13">
         <path fill="#FAFBFC" stroke="#E5E7EB" stroke-width="1" id="rect11" d="M8,0 H237 A8,8 0 0 1 245,8 V42 A8,8 0 0 1 237,50 H8 A8,8 0 0 1 0,42 V8 A8,8 0 0 1 8,0 Z" />
-        <text x="15" y="22" font-family="monospace" font-size="11" fill="#6366F1" id="text12">batch_validate.py</text>
+        <text x="15" y="22" font-family="monospace" font-size="11" fill="#6366F1" id="text12">batch_validate</text>
         <text x="15" y="38" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#6B7280" id="text13">批量验证多个项目</text>
       </g>
     </g>

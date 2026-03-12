@@ -5,7 +5,7 @@
 ## 创建新项目
 
 ```bash
-python3 skills/slidemax_workflow/commands/project_manager.py init my_project --format ppt169
+python3 skills/slidemax_workflow/scripts/slidemax.py project_manager init my_project --format ppt169
 ```
 
 ## 目录结构

@@ -4,7 +4,7 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
-from slidemax.project_utils import CANVAS_FORMATS
+from .project_utils import CANVAS_FORMATS
 
 @dataclass
 class ChartArea:

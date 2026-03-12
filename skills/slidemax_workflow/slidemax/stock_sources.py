@@ -444,7 +444,21 @@ def add_shared_record_arguments(parser: argparse.ArgumentParser) -> None:
 def build_register_parser() -> argparse.ArgumentParser:
     """Build the parser for the stock registration CLI."""
 
-    parser = argparse.ArgumentParser(description="Register a stock image into images/stock/manifest.json.")
+    parser = argparse.ArgumentParser(
+        prog='python3 skills/slidemax_workflow/scripts/slidemax.py register_stock_image',
+        description="Register a stock image into images/stock/manifest.json.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog='''
+When to use:
+  - Register a stock image that already exists locally or is already copied into the project
+  - Use `--list-providers` to inspect supported stock providers before registering
+
+Examples:
+  %(prog)s workspace/demo --provider unsplash --source-url https://unsplash.com/photos/example --local-path images/stock/hero.jpg
+  %(prog)s workspace/demo --provider pexels --source-url https://www.pexels.com/photo/example --local-file ~/Downloads/hero.jpg
+  %(prog)s --list-providers
+''',
+    )
     add_shared_record_arguments(parser)
     parser.add_argument("--download-url", dest="download_url", default=None, help="Recorded download URL.")
     parser.add_argument(
@@ -465,7 +479,21 @@ def build_register_parser() -> argparse.ArgumentParser:
 def build_download_parser() -> argparse.ArgumentParser:
     """Build the parser for the download-and-register CLI."""
 
-    parser = argparse.ArgumentParser(description="Download a stock image and register it into images/stock/manifest.json.")
+    parser = argparse.ArgumentParser(
+        prog='python3 skills/slidemax_workflow/scripts/slidemax.py download_stock_image',
+        description="Download a stock image and register it into images/stock/manifest.json.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog='''
+When to use:
+  - Download a stock image into the project and register its provenance in one step
+  - Use `--list-providers` to inspect supported stock providers before downloading
+
+Examples:
+  %(prog)s workspace/demo --provider unsplash --source-url https://unsplash.com/photos/example --download-url https://images.unsplash.com/example.jpg
+  %(prog)s workspace/demo --provider pexels --source-url https://www.pexels.com/photo/example --download-url https://images.pexels.com/photos/example.jpeg --timeout 30
+  %(prog)s --list-providers
+''',
+    )
     add_shared_record_arguments(parser)
     parser.add_argument("--download-url", dest="download_url", help="Direct download URL.")
     parser.add_argument("--timeout", type=int, default=60, help="Download timeout in seconds.")

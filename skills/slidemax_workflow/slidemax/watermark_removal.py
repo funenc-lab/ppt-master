@@ -164,9 +164,14 @@ class GeminiWatermarkRemover:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
+        prog='python3 skills/slidemax_workflow/scripts/slidemax.py gemini_watermark_remover',
         description='Remove Gemini watermark overlays from generated images.',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog='''
+When to use:
+  - Clean Gemini-generated images before delivery when the star watermark is still present
+  - Provide `-o` to write to a specific destination instead of the default sibling output
+
 Examples:
   %(prog)s workspace/demo/images/bg_01.png
   %(prog)s image.jpg -o image_clean.jpg

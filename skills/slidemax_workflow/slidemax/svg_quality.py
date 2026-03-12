@@ -272,7 +272,7 @@ class SVGQualityChecker:
 
         if self.summary['errors'] > 0 or self.summary['warnings'] > 0:
             print('\n[TIP] Common fixes:')
-            print('  1. viewBox issues: keep it aligned with docs/canvas_formats.md')
+            print('  1. viewBox issues: keep it aligned with references/docs/canvas_formats.md')
             print('  2. foreignObject: replace with <text> + <tspan> manual wrapping')
             print('  3. font issues: use a system UI font stack')
 
@@ -319,9 +319,14 @@ def build_parser() -> argparse.ArgumentParser:
     """Build the CLI parser for the SVG quality checker."""
 
     parser = argparse.ArgumentParser(
+        prog='python3 skills/slidemax_workflow/scripts/slidemax.py svg_quality_checker',
         description='SlideMax SVG quality checker',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog='''
+When to use:
+  - Check one SVG, one project, or all examples for compatibility problems
+  - Run this before export when layout or SVG compliance looks suspicious
+
 Examples:
   %(prog)s path/to/slide.svg
   %(prog)s path/to/svg_output

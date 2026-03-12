@@ -3,7 +3,7 @@ set -euo pipefail
 
 source .env.slidemax-ark
 
-python3 skills/slidemax_workflow/commands/doubao_i2v_task.py run \
+python3 skills/slidemax_workflow/scripts/slidemax.py doubao_i2v_task run \
   "A drone flies rapidly through complex obstacles and natural wonders" \
   --image-url "https://ark-project.tos-cn-beijing.volces.com/doc_image/seepro_i2v.png" \
   --model "doubao-seedance-1-5-pro-251215" \

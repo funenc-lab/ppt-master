@@ -42,7 +42,9 @@ ls -la "<参考来源路径>"
 mkdir -p "skills/slidemax_workflow/templates/layouts/<新模板名称>"
 ```
 
-> ⚠️ **输出位置**：全局模板输出到 `skills/slidemax_workflow/templates/layouts/`，项目模板输出到 `workspace/<项目>/templates/`
+> ⚠️ **输出位置**：本工作流只创建全局可复用模板，统一输出到 `skills/slidemax_workflow/templates/layouts/`。
+>
+> 项目交付阶段如需使用该模板，请在正常 PPT workflow 中将模板文件复制到项目 `templates/` 目录，而不是在此工作流中直接写入项目目录。
 
 ---
 

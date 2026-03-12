@@ -9,7 +9,7 @@ SKILL_ROOT = PROJECT_ROOT / "skills" / "slidemax_workflow"
 if str(SKILL_ROOT) not in sys.path:
     sys.path.insert(0, str(SKILL_ROOT))
 
-from slidemax.svg_position_cli import analyze_svg_file, build_chart_area, execute_parsed_command
+from slidemax.subcommands.svg_position import analyze_svg_file, build_chart_area, execute_parsed_command
 
 
 class _FakeParser:

@@ -93,7 +93,21 @@ def _should_fail(decisions: Sequence[AssetPolicyDecision], fail_on: Optional[str
 def build_parser() -> argparse.ArgumentParser:
     """Build the CLI parser for asset policy auditing."""
 
-    parser = argparse.ArgumentParser(description="Audit image assets for provenance and watermark policy routing.")
+    parser = argparse.ArgumentParser(
+        prog='python3 skills/slidemax_workflow/scripts/slidemax.py audit_image_asset',
+        description="Audit image assets for provenance and watermark policy routing.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog='''
+When to use:
+  - Audit images before final delivery when provenance or watermark risk is uncertain
+  - Use `--json` when another tool needs machine-readable decisions
+
+Examples:
+  %(prog)s workspace/demo/images/hero.png
+  %(prog)s workspace/demo/images/hero.png workspace/demo/images/chart.png --fail-on suspicious
+  %(prog)s workspace/demo/images/hero.png --json
+''',
+    )
     parser.add_argument("image_paths", nargs="+", type=Path, help="Image paths to audit.")
     parser.add_argument("--json", action="store_true", help="Print machine-readable JSON output.")
     parser.add_argument(

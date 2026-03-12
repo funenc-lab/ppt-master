@@ -198,9 +198,14 @@ def build_parser() -> argparse.ArgumentParser:
     """Build the CLI parser for splitting `notes/total.md`."""
 
     parser = argparse.ArgumentParser(
+        prog='python3 skills/slidemax_workflow/scripts/slidemax.py total_md_split',
         description='SlideMax notes splitting tool',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog='''
+When to use:
+    - Split `notes/total.md` before final delivery so note coverage is explicit
+    - Use `-o` when writing note files to a non-default directory
+
 Examples:
     %(prog)s workspace/<project>_ppt169_YYYYMMDD
     %(prog)s workspace/<project>_ppt169_YYYYMMDD -o notes

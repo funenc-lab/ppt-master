@@ -11,7 +11,7 @@ if str(SKILL_ROOT) not in sys.path:
     sys.path.insert(0, str(SKILL_ROOT))
 
 from slidemax.video_generation import VideoGenerationResult, execute_parsed_command
-from slidemax.video_generation_cli import run_cli
+from slidemax.subcommands.video_generation import run_cli
 
 VIDEO_BYTES = b"\x00\x00\x00 ftypisom\x00\x00\x02\x00isomiso2mp41"
 

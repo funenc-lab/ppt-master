@@ -609,11 +609,15 @@ def build_parser() -> argparse.ArgumentParser:
         description='PDF to Markdown converter with structure-aware extraction.',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog='''
+When to use:
+  - Convert PDF source material into Markdown before strategy or outline work starts
+  - Use directory mode when normalizing many PDFs in one batch
+
 Examples:
-  python3 skills/slidemax_workflow/commands/pdf_to_md.py book.pdf
-  python3 skills/slidemax_workflow/commands/pdf_to_md.py book.pdf -o output.md
-  python3 skills/slidemax_workflow/commands/pdf_to_md.py ./pdfs
-  python3 skills/slidemax_workflow/commands/pdf_to_md.py ./pdfs -o ./markdown
+  python3 skills/slidemax_workflow/scripts/slidemax.py pdf_to_md book.pdf
+  python3 skills/slidemax_workflow/scripts/slidemax.py pdf_to_md book.pdf -o output.md
+  python3 skills/slidemax_workflow/scripts/slidemax.py pdf_to_md ./pdfs
+  python3 skills/slidemax_workflow/scripts/slidemax.py pdf_to_md ./pdfs -o ./markdown
 
 Extraction features:
   - Detect heading levels from font sizes

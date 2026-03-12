@@ -575,11 +575,11 @@ def main():
     if len(sys.argv) < 2:
         print("SlideMax - 配置管理工具\n")
         print("用法:")
-        print("  python3 skills/slidemax_workflow/commands/config.py list-formats     # 列出所有画布格式")
-        print("  python3 skills/slidemax_workflow/commands/config.py list-colors      # 列出所有配色方案")
-        print("  python3 skills/slidemax_workflow/commands/config.py list-industries  # 列出所有行业配色")
-        print("  python3 skills/slidemax_workflow/commands/config.py export           # 导出配置到 JSON")
-        print("  python3 skills/slidemax_workflow/commands/config.py format <key>     # 查看指定画布格式")
+        print("  python3 skills/slidemax_workflow/scripts/slidemax.py config list-formats     # 列出所有画布格式")
+        print("  python3 skills/slidemax_workflow/scripts/slidemax.py config list-colors      # 列出所有配色方案")
+        print("  python3 skills/slidemax_workflow/scripts/slidemax.py config list-industries  # 列出所有行业配色")
+        print("  python3 skills/slidemax_workflow/scripts/slidemax.py config export           # 导出配置到 JSON")
+        print("  python3 skills/slidemax_workflow/scripts/slidemax.py config format <key>     # 查看指定画布格式")
         return
 
     command = sys.argv[1]

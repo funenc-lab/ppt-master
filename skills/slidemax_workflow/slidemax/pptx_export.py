@@ -100,9 +100,15 @@ def build_parser(canvas_formats: Dict[str, dict], transition_choices: Sequence[s
     """Build the CLI parser for PPTX export entrypoints."""
 
     parser = argparse.ArgumentParser(
+        prog="python3 skills/slidemax_workflow/scripts/slidemax.py svg_to_pptx",
         description="SlideMax - SVG to PPTX exporter",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=f"""
+When to use:
+    - Export delivery-ready slides after `finalize_svg`
+    - Use `-s final` for the standard release path
+    - Use `-s output` only when debugging raw SVG output before finalization
+
 Examples:
     %(prog)s skills/slidemax_workflow/examples/demo_project_intro_ppt169_20251211 -s final
     %(prog)s skills/slidemax_workflow/examples/demo_project_intro_ppt169_20251211 --no-compat

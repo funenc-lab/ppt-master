@@ -29,7 +29,7 @@
 **完成后**运行工具一次性替换：
 
 ```bash
-python3 skills/slidemax_workflow/commands/embed_icons.py svg_output/*.svg
+python3 skills/slidemax_workflow/scripts/slidemax.py embed_icons svg_output/*.svg
 ```
 
 ### 方法二：直接复制嵌入

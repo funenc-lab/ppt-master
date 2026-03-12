@@ -52,7 +52,7 @@
 | **成功色**    | `#......` | 正向指标（绿色系）                                      |
 | **警示色**    | `#......` | 问题标注（红色系）                                      |
 
-> 💡 **参考**: 行业配色见 `roles/Strategist.md` 或 `commands/config.py` 中的 `INDUSTRY_COLORS`
+> 💡 **参考**: 行业配色见 `roles/Strategist.md` 或 `scripts/slidemax.py config` 中的 `INDUSTRY_COLORS`
 
 ### 渐变方案（如需要，使用 SVG 语法）
 
@@ -90,7 +90,7 @@
 
 **字体栈**: `[填写 CSS font-family 字符串]`
 
-> 💡 **参考**: 字体分类详见 `docs/design_guidelines.md`
+> 💡 **参考**: 字体分类详见 `references/docs/design_guidelines.md`
 
 ### 字号层级
 

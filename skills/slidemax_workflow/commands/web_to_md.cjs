@@ -3,10 +3,10 @@
  * web_to_md.cjs - Web Page to Markdown Converter (Enhanced)
  *
  * Usage:
- *   node skills/slidemax_workflow/commands/web_to_md.cjs <url>              # Single URL
- *   node skills/slidemax_workflow/commands/web_to_md.cjs <url1> <url2> ...  # Multiple URLs
- *   node skills/slidemax_workflow/commands/web_to_md.cjs -f urls.txt        # Read URLs from file
- *   node skills/slidemax_workflow/commands/web_to_md.cjs <url> -o output.md # Specify output filename
+ *   python3 skills/slidemax_workflow/scripts/slidemax.py web_to_md_cjs <url>              # Single URL
+ *   python3 skills/slidemax_workflow/scripts/slidemax.py web_to_md_cjs <url1> <url2> ...  # Multiple URLs
+ *   python3 skills/slidemax_workflow/scripts/slidemax.py web_to_md_cjs -f urls.txt        # Read URLs from file
+ *   python3 skills/slidemax_workflow/scripts/slidemax.py web_to_md_cjs <url> -o output.md # Specify output filename
  */
 
 const fs = require("fs").promises;
@@ -729,33 +729,37 @@ async function processUrl(url, outputPath) {
   }
 }
 
+function printHelp() {
+  console.log("");
+  console.log("=".repeat(60));
+  console.log("  Web to Markdown - Enhanced Web Page Crawler & Converter");
+  console.log("=".repeat(60));
+  console.log("");
+  console.log("  Usage:");
+  console.log("    python3 skills/slidemax_workflow/scripts/slidemax.py web_to_md_cjs <url>");
+  console.log("    python3 skills/slidemax_workflow/scripts/slidemax.py web_to_md_cjs <url1> <url2> ...");
+  console.log("    python3 skills/slidemax_workflow/scripts/slidemax.py web_to_md_cjs -f urls.txt");
+  console.log("    python3 skills/slidemax_workflow/scripts/slidemax.py web_to_md_cjs <url> -o output.md");
+  console.log("");
+  console.log("  Options:");
+  console.log("    -f, --file <file>    Read URLs from file (one per line)");
+  console.log(
+    "    -o, --output <file>  Specify output filename (single URL only)"
+  );
+  console.log(
+    "    -d, --dir <dir>      Specify output directory (default: ./output)"
+  );
+  console.log("    -h, --help           Show help");
+  console.log("");
+  console.log("=".repeat(60));
+}
+
 // ============ Main Function ============
 async function main() {
   const args = process.argv.slice(2);
 
   if (args.length === 0) {
-    console.log("");
-    console.log("=".repeat(60));
-    console.log("  Web to Markdown - Enhanced Web Page Crawler & Converter");
-    console.log("=".repeat(60));
-    console.log("");
-    console.log("  Usage:");
-    console.log("    node skills/slidemax_workflow/commands/web_to_md.cjs <url>");
-    console.log("    node skills/slidemax_workflow/commands/web_to_md.cjs <url1> <url2> ...");
-    console.log("    node skills/slidemax_workflow/commands/web_to_md.cjs -f urls.txt");
-    console.log("    node skills/slidemax_workflow/commands/web_to_md.cjs <url> -o output.md");
-    console.log("");
-    console.log("  Options:");
-    console.log("    -f, --file <file>    Read URLs from file (one per line)");
-    console.log(
-      "    -o, --output <file>  Specify output filename (single URL only)"
-    );
-    console.log(
-      "    -d, --dir <dir>      Specify output directory (default: ./output)"
-    );
-    console.log("    -h, --help           Show help");
-    console.log("");
-    console.log("=".repeat(60));
+    printHelp();
     process.exit(0);
   }
 
@@ -767,8 +771,7 @@ async function main() {
     const arg = args[i];
 
     if (arg === "-h" || arg === "--help") {
-      args.length = 0;
-      await main();
+      printHelp();
       return;
     }
 

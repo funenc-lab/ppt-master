@@ -14,15 +14,10 @@ SKILL_CASES = [
             "AGENTS.md",
             "workflows/generate-ppt.md",
             "commands/README.md",
-            "roles/README.md",
+            "roles/AGENTS.md",
         ],
         "required_commands": [
-            "commands/project_manager.py",
-            "commands/pdf_to_md.py",
-            "commands/web_to_md.py",
-            "commands/image_generate.py",
-            "commands/finalize_svg.py",
-            "commands/svg_to_pptx.py",
+            "scripts/slidemax.py",
         ],
     },
     {

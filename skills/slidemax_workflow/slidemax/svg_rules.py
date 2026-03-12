@@ -129,7 +129,7 @@ _SUBSTRING_DETECTION_SPECS: Tuple[SubstringDetectionSpec, ...] = (
             '移除 <foreignObject> 元素',
             '使用 <text> + <tspan> 进行手动换行',
             '这是项目的技术规范要求',
-            '参考: docs/design_guidelines.md',
+            '参考: references/docs/design_guidelines.md',
         ),
     ),
     SubstringDetectionSpec(

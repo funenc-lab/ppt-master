@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import os
 import shlex
 import sys
@@ -9,17 +10,16 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Sequence
 
-from slidemax.config import EXTRA_EXAMPLE_PATHS_ENV, PROJECT_ROOT, SKILL_ROOT, get_example_dirs
-from slidemax.project_utils import CANVAS_FORMATS, find_all_projects, get_project_info
+from .config import EXTRA_EXAMPLE_PATHS_ENV, PROJECT_ROOT, SKILL_ROOT, get_example_dirs
+from .project_utils import CANVAS_FORMATS, find_all_projects, get_project_info
 
-CANONICAL_COMMANDS_DIR = (PROJECT_ROOT / 'skills' / 'slidemax_workflow' / 'commands').resolve()
+CANONICAL_CLI = (PROJECT_ROOT / 'skills' / 'slidemax_workflow' / 'scripts' / 'slidemax.py').resolve()
 SKILL_RESOURCES = [
     ('Workflow rules', Path('AGENTS.md')),
-    ('Docs index', Path('docs/README.md')),
-    ('Workflow tutorial', Path('docs/workflow_tutorial.md')),
-    ('Design guidelines', Path('docs/design_guidelines.md')),
-    ('Canvas formats', Path('docs/canvas_formats.md')),
-    ('Roles', Path('roles/README.md')),
+    ('Design guidelines', Path('references/docs/design_guidelines.md')),
+    ('Canvas formats', Path('references/docs/canvas_formats.md')),
+    ('Image prompt guidance', Path('references/docs/image_prompt_guidance.md')),
+    ('Roles', Path('roles/AGENTS.md')),
     ('Chart templates', Path('templates/charts/README.md')),
 ]
 FORMAT_ORDER = ['ppt169', 'ppt43', 'wechat', 'xiaohongshu', 'moments', 'story', 'banner', 'a4']
@@ -66,18 +66,42 @@ def shell_command(python_file: Path, *args: str, base_dir: Optional[Path] = None
     return ' '.join(parts)
 
 
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        prog='python3 skills/slidemax_workflow/scripts/slidemax.py generate_examples_index',
+        description='Regenerate README indexes for one or more examples roots.',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog='''
+When to use:
+  - Refresh examples indexes after adding, removing, or updating bundled example projects
+  - Run without arguments to refresh the built-in examples roots discovered by the shared config
+
+Examples:
+  %(prog)s
+  %(prog)s skills/slidemax_workflow/examples
+  %(prog)s skills/slidemax_workflow/examples /tmp/custom_examples
+''',
+    )
+    parser.add_argument(
+        'examples_dirs',
+        nargs='*',
+        help='Examples root directories to refresh. Defaults to the configured built-in roots.',
+    )
+    return parser
+
+
 def build_render_context(examples_path: Path) -> ExamplesRenderContext:
     resolved_examples_path = examples_path.resolve()
     resolved_project_root = PROJECT_ROOT.resolve()
     inside_repo = is_relative_to(resolved_examples_path, resolved_project_root)
 
-    generator_path = CANONICAL_COMMANDS_DIR / 'generate_examples_index.py'
-    project_manager_path = CANONICAL_COMMANDS_DIR / 'project_manager.py'
+    cli_path = CANONICAL_CLI
 
     if inside_repo:
-        command_reference = relative_link(resolved_examples_path, generator_path)
+        command_reference = relative_link(resolved_examples_path, cli_path)
         project_manager_command = shell_command(
-            project_manager_path,
+            cli_path,
+            'project_manager',
             'init',
             'my_project',
             '--format',
@@ -85,28 +109,30 @@ def build_render_context(examples_path: Path) -> ExamplesRenderContext:
             base_dir=resolved_examples_path,
         )
         validate_command = shell_command(
-            project_manager_path,
+            cli_path,
+            'project_manager',
             'validate',
             './<project>',
             base_dir=resolved_examples_path,
         )
-        update_command = shell_command(generator_path, base_dir=resolved_examples_path)
+        update_command = shell_command(cli_path, 'generate_examples_index', base_dir=resolved_examples_path)
         resource_lines = [
             f"- [{label}]({relative_link(resolved_examples_path, SKILL_ROOT.resolve() / target)})"
             for label, target in SKILL_RESOURCES
         ]
         resource_note = None
     else:
-        command_reference = str(generator_path)
+        command_reference = str(cli_path)
         project_manager_command = shell_command(
-            project_manager_path,
+            cli_path,
+            'project_manager',
             'init',
             'my_project',
             '--format',
             'ppt169',
         )
-        validate_command = shell_command(project_manager_path, 'validate', './<project>')
-        update_command = shell_command(generator_path, str(resolved_examples_path))
+        validate_command = shell_command(cli_path, 'project_manager', 'validate', './<project>')
+        update_command = shell_command(cli_path, 'generate_examples_index', str(resolved_examples_path))
         resource_lines = [
             f"- {label}: `{(SKILL_ROOT.resolve() / target).resolve()}`"
             for label, target in SKILL_RESOURCES
@@ -206,10 +232,11 @@ def build_examples_index(examples_path: Path, now: Optional[datetime] = None) ->
 
     content.append('\n## Usage\n')
     content.append('### Preview a project\n')
-    content.append('Each example project usually contains:\n')
-    content.append('- `README.md` - project overview')
+    content.append('Each example project contains:\n')
     content.append('- `Design specification` markdown')
-    content.append('- `svg_output/` - raw SVG output\n')
+    content.append('- `svg_output/` - raw SVG output')
+    content.append('- `svg_final/` - finalized SVG output')
+    content.append('- `README.md` - optional project overview for curated examples\n')
 
     content.append('**Method 1: HTTP server (recommended)**\n')
     content.append('```bash')
@@ -232,9 +259,10 @@ def build_examples_index(examples_path: Path, now: Optional[datetime] = None) ->
     content.append('Contributions are welcome in this examples root.\n')
     content.append('### Project requirements\n')
     content.append('1. Follow the standard project structure')
-    content.append('2. Include a complete `README.md` and design specification')
-    content.append('3. Keep SVG files aligned with the technical constraints')
-    content.append('4. Use the directory format `{project_name}_{format}_{YYYYMMDD}`\n')
+    content.append('2. Include a complete `README.md` for new curated examples')
+    content.append('3. Include a design specification and keep SVG files aligned with the technical constraints')
+    content.append('4. Use the directory format `{project_name}_{format}_{YYYYMMDD}` for new examples')
+    content.append('5. Legacy examples may use older naming conventions, but new additions should not\n')
 
     content.append('### Workflow\n')
     if context.inside_repo:
@@ -265,8 +293,8 @@ def generate_examples_index(examples_dir: str = 'examples') -> str:
     return build_examples_index(Path(examples_dir)).content
 
 
-def resolve_target_dirs(argv: Sequence[str]) -> List[Path]:
-    target_dirs = [Path(arg) for arg in argv if not arg.startswith('--')]
+def resolve_target_dirs(target_args: Sequence[str]) -> List[Path]:
+    target_dirs = [Path(arg) for arg in target_args]
     if target_dirs:
         return target_dirs
     return get_example_dirs()
@@ -274,7 +302,9 @@ def resolve_target_dirs(argv: Sequence[str]) -> List[Path]:
 
 def run_cli(argv: Optional[Sequence[str]] = None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
-    target_dirs = resolve_target_dirs(argv)
+    parser = build_parser()
+    args = parser.parse_args(argv)
+    target_dirs = resolve_target_dirs(args.examples_dirs)
     extra_example_dirs = get_example_dirs(include_default=False)
 
     print('=' * 80)
@@ -314,12 +344,13 @@ def main() -> None:
 
 
 __all__ = [
-    'CANONICAL_COMMANDS_DIR',
+    'CANONICAL_CLI',
     'SKILL_RESOURCES',
     'FORMAT_ORDER',
     'ExamplesRenderContext',
     'ExamplesIndexResult',
     'build_examples_index',
+    'build_parser',
     'build_render_context',
     'collect_projects',
     'generate_examples_index',

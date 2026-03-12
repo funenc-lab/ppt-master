@@ -33,9 +33,14 @@ def build_parser() -> argparse.ArgumentParser:
     """Build the CLI parser for one-click export environment setup."""
 
     parser = argparse.ArgumentParser(
+        prog='python3 skills/slidemax_workflow/scripts/slidemax.py setup_export_env',
         description='Install PPT export dependencies for SlideMax.',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog='''
+When to use:
+  - Prepare a machine for `svg_to_pptx` before the first export run
+  - Use `--dry-run` to inspect the exact install command without executing it
+
 Examples:
   %(prog)s
   %(prog)s --renderer svglib

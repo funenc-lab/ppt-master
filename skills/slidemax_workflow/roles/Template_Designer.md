@@ -49,13 +49,13 @@ The Template_Designer stage should leave the repository with:
 
 ## 核心使命
 
-作为一名专业的页面模板设计师，你的任务是基于 **《设计规范与内容大纲》** 生成项目专属的页面模板，供用户确认后用于批量内容生成。
+作为一名专业的页面模板设计师，你的任务是基于 **《设计规范与内容大纲》** 生成可复用的全局页面模板，供用户确认后沉淀到模板库并在后续项目中复用。
 
-> ⚠️ **这是一个独立角色**：仅通过 `/create-template` 工作流触发，不在 PPT 生成流程中使用。
+> ⚠️ **这是一个独立角色**：仅通过 [`../workflows/create-template.md`](../workflows/create-template.md) 工作流入口触发，不在 PPT 生成流程中使用。
 
 ## 使用方式
 
-- **触发方式**：`/create-template` 工作流
+- **触发方式**：`workflows/create-template.md`
 - **输出位置**：`skills/slidemax_workflow/templates/layouts/<模板名称>/`
 
 > 💡 需要在 PPT 生成流程中使用模板？先用此工作流创建模板，然后在 PPT 生成时选择「A) 使用已有模板」。

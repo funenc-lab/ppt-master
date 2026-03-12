@@ -1,5 +1,5 @@
 ---
-description: 从 Markdown 源文档生成 PPT 的完整流程（主入口）
+description: Redirect entry for the PPT workflow. Read AGENTS.md for the authoritative workflow and rule handbook.
 ---
 
 # PPT 生成工作流
@@ -9,13 +9,12 @@ description: 从 Markdown 源文档生成 PPT 的完整流程（主入口）
 > 请直接阅读 [AGENTS.md](../AGENTS.md)，该文件包含完整的工作流程和规则手册。
 
 **快速跳转**：
-- [工作流程](../AGENTS.md#工作流程) — 从源文档到 PPT 的完整执行步骤
-- [规则手册](../AGENTS.md#规则手册) — 约束边界、技术规范、角色切换协议
+- [Workflow](../AGENTS.md#workflow) — the full execution stages from source material to delivery
+- [Rulebook](../AGENTS.md#rulebook) — constraints, technical rules, and role switching protocol
 
 
 **Operational quickstart:**
 - [Operational Quickstart](../AGENTS.md#operational-quickstart)
 - [Stage Gate Checklist](../AGENTS.md#stage-gate-checklist)
 - [Reliability Checklist](../AGENTS.md#reliability-checklist)
-- [PPT 工作流操作手册](../docs/ppt_workflow_operator_manual.md)
 - [OCR Image to Markdown skill](../../../.agent/skills/ocr_image_to_markdown/SKILL.md)

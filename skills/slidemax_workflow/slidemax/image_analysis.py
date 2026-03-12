@@ -258,7 +258,20 @@ def run_cli(images_dir: Path, csv_path: Optional[Path] = None) -> int:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description='Analyze a directory of images for PPT layout planning.')
+    parser = argparse.ArgumentParser(
+        prog='python3 skills/slidemax_workflow/scripts/slidemax.py analyze_images',
+        description='Analyze a directory of images for PPT layout planning.',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog='''
+When to use:
+  - Analyze project-local images before slide layout or image selection work starts
+  - Export a CSV inventory when you need a reusable asset summary for prompts or review
+
+Examples:
+  %(prog)s workspace/demo/images
+  %(prog)s workspace/demo/images --csv workspace/demo/images/image_inventory.csv
+''',
+    )
     parser.add_argument('images_dir', type=Path, help='Image directory path')
     parser.add_argument('--csv', type=Path, default=None, help='Optional CSV output path')
     return parser

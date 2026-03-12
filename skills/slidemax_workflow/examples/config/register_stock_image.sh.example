@@ -5,7 +5,7 @@ set -euo pipefail
 PROJECT_DIR="workspace/demo_project"
 LOCAL_FILE="/absolute/path/to/downloaded/hero.jpg"
 
-python3 skills/slidemax_workflow/commands/register_stock_image.py \
+python3 skills/slidemax_workflow/scripts/slidemax.py register_stock_image \
   "$PROJECT_DIR" \
   --provider unsplash \
   --source-url "https://unsplash.com/photos/example-id" \
