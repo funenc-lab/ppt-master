@@ -6,7 +6,10 @@ Before performing any PPT workflow task, read:
 - `skills/slidemax_workflow/AGENTS.md`
 - `skills/slidemax_workflow/workflows/generate-ppt.md`
 
-Use the command entry points under:
+Use the command tool under:
+- `skills/slidemax_workflow/scripts/slidemax.py`
+
+Use the command documentation and non-Python fallback resources under:
 - `skills/slidemax_workflow/commands/`
 
 Use the shared Python core under:

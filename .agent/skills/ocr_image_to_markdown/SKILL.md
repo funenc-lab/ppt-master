@@ -164,7 +164,7 @@ Fix:
 
 In the PPT workflow, this skill acts as a Stage 1 fallback for image-based source normalization.
 
-Use it when the source material is not suitable for `pdf_to_md.py`, `web_to_md.py`, or `web_to_md.cjs`, but the downstream PPT workflow still requires Markdown as the working source.
+Use it when the source material is not suitable for `pdf_to_md`, `web_to_md`, or `web_to_md_cjs`, but the downstream PPT workflow still requires Markdown as the working source.
 
 Recommended handoff pattern:
 
