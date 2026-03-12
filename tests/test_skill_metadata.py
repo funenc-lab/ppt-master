@@ -13,7 +13,7 @@ SKILL_CASES = [
         "required_guides": [
             "AGENTS.md",
             "workflows/generate-ppt.md",
-            "commands/README.md",
+            "references/docs/command_reference.md",
             "roles/AGENTS.md",
         ],
         "required_commands": [

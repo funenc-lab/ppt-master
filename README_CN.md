@@ -29,7 +29,7 @@ pip install -r requirements.txt
 
 - 工作流手册：[`skills/slidemax_workflow/AGENTS.md`](./skills/slidemax_workflow/AGENTS.md)
 - Skill 入口：[`skills/slidemax_workflow/SKILL.md`](./skills/slidemax_workflow/SKILL.md)
-- 工具说明：[`skills/slidemax_workflow/commands/README_CN.md`](./skills/slidemax_workflow/commands/README_CN.md)
+- 工具说明：[`skills/slidemax_workflow/references/docs/command_reference_cn.md`](./skills/slidemax_workflow/references/docs/command_reference_cn.md)
 - 角色定义：[`skills/slidemax_workflow/roles/AGENTS.md`](./skills/slidemax_workflow/roles/AGENTS.md)
 - 示例索引：[`skills/slidemax_workflow/examples/README.md`](./skills/slidemax_workflow/examples/README.md)
 
@@ -46,5 +46,5 @@ slidemax/
 ## 说明
 
 - 不要把本 README 当作第二套 workflow 手册。
-- 日常命令入口优先使用 `skills/slidemax_workflow/commands/`。
+- 日常命令入口优先使用 `skills/slidemax_workflow/scripts/slidemax.py`，命令说明统一看 `skills/slidemax_workflow/references/docs/command_reference_cn.md`。
 - 解释、执行或修改工作流时，统一以 `skills/slidemax_workflow/AGENTS.md` 为准。

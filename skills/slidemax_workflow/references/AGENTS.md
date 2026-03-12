@@ -32,6 +32,6 @@ This directory stores supporting references for `skills/slidemax_workflow/`.
 
 - [Workflow handbook](../AGENTS.md)
 - [Skill entry](../SKILL.md)
-- [Commands reference](../commands/README.md)
+- [Commands reference](./docs/command_reference.md)
 - [Role handbook](../roles/AGENTS.md)
 - [Documentation index](./docs/README.md)

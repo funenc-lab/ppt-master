@@ -21,4 +21,4 @@ This directory stores focused reference guides for role documents.
 
 - Keep role entry files in `../` focused on stage execution and handoff.
 - Keep provider-specific setup in `../../references/docs/`.
-- Keep command detail in `../../commands/README.md`.
+- Keep command detail in `../../references/docs/command_reference.md`.

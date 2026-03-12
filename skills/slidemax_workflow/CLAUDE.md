@@ -9,6 +9,6 @@ Quick links:
 
 - [Workflow handbook](./AGENTS.md)
 - [Skill entry](./SKILL.md)
-- [Command reference](./commands/README.md)
+- [Command reference](./references/docs/command_reference.md)
 - [Role handbook](./roles/AGENTS.md)
 - [Workflow redirect](./workflows/generate-ppt.md)

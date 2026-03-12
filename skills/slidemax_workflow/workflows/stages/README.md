@@ -21,4 +21,4 @@ This directory stores the detailed stage playbooks referenced by `../AGENTS.md`.
 - Update `../AGENTS.md` first when stage order or gate rules change.
 - Keep each playbook scoped to one stage group.
 - Put role-specific detail in `../../roles/` or `../../roles/guides/`, not here.
-- Put command detail in `../../commands/README.md`, not here.
+- Put command detail in `../../references/docs/command_reference.md`, not here.

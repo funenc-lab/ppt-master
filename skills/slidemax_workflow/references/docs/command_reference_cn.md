@@ -1,14 +1,15 @@
 # SlideMax 命令参考
 
-[English](./README.md) | 中文
+[English](./command_reference.md) | 中文
 
-本目录用于说明 SlideMax workflow 的命令面，并保留非 Python 的命令资源。规范入口是单一命令工具 `skills/slidemax_workflow/scripts/slidemax.py`；可复用实现优先沉到 `skills/slidemax_workflow/slidemax/`，`web_to_md_cjs` 仍作为高防站点的独立 Node fallback 实现保留在本目录。
+本文档用于说明 SlideMax workflow 的命令面。规范入口是单一命令工具 `skills/slidemax_workflow/scripts/slidemax.py`；可复用实现优先沉到 `skills/slidemax_workflow/slidemax/`，`web_to_md_cjs` 作为高防站点的独立 Node fallback 保留在 `skills/slidemax_workflow/scripts/web_to_md.cjs`。
 
 ## 当前规范
 
 - 使用 `skills/slidemax_workflow/scripts/slidemax.py` 作为 canonical command tool。
 - 使用 `skills/slidemax_workflow/slidemax/` 作为共享 Python core 与命令注册中心。
-- 将 `skills/slidemax_workflow/commands/` 视为命令文档与 Node fallback 承载目录。
+- 将 `skills/slidemax_workflow/references/docs/command_reference*.md` 视为命令文档。
+- 将 `skills/slidemax_workflow/scripts/web_to_md.cjs` 视为独立 Node fallback 实现。
 - 当命令行为变化时，优先更新统一命令工具与共享核心，再同步回写文档。
 
 ## 命令快速入口
@@ -98,12 +99,12 @@ python3 skills/slidemax_workflow/scripts/slidemax.py project_manager validate wo
 
 ## 相关资源
 
-- [工作流规则](../AGENTS.md)
-- [工作流索引](../workflows/README.md)
-- [文档中心](../references/docs/README_CN.md)
-- [图片提示词指南](../references/docs/image_prompt_guidance.md)
-- [角色定义](../roles/AGENTS.md)
-- [图表模板](../templates/charts/README.md)
+- [工作流规则](../../AGENTS.md)
+- [工作流索引](../../workflows/README.md)
+- [文档中心](./README_CN.md)
+- [图片提示词指南](./image_prompt_guidance.md)
+- [角色定义](../../roles/AGENTS.md)
+- [图表模板](../../templates/charts/README.md)
 
 ## 工具架构总览
 
@@ -193,9 +194,9 @@ graph TB
 
 ### 工具分类快速索引
 
-> 说明：`scripts/slidemax.py` 是 canonical 命令入口，`commands/` 保存命令文档与 Node fallback，`slidemax/` 是 canonical 共享核心目录。
+> 说明：`scripts/slidemax.py` 是 canonical 命令入口，`references/docs/command_reference*.md` 保存命令文档，`scripts/web_to_md.cjs` 是独立 Node fallback，`slidemax/` 是 canonical 共享核心目录。
 >
-> 扩展约束：新增 Python CLI 入口统一走 `scripts/slidemax.py`；新增可复用能力优先沉到 `slidemax/`。`web_to_md_cjs` 是独立 Node fallback 的实现名称；共享配置与项目工具应直接从 `slidemax/*.py` 读取，而不是再新增 `commands/*.py`。
+> 扩展约束：新增 Python CLI 入口统一走 `scripts/slidemax.py`；新增可复用能力优先沉到 `slidemax/`。`web_to_md_cjs` 是独立 Node fallback 的实现名称；共享配置与项目工具应直接从 `slidemax/*.py` 读取，而不是再新增分散的独立脚本入口。
 
 | 分类 | 工具 | 说明 |
 |------|------|------|
@@ -1413,9 +1414,9 @@ export SLIDEMAX_IMAGE_OUTPUT_DIR="workspace/demo/images"
 export SLIDEMAX_IMAGE_MODEL="gemini-3.1-flash-image-preview"
 ```
 
-Provider details are documented in `../references/docs/image_generation_providers.md`.
-Credential and command templates are available in `../examples/config/slidemax_image.env.example`, `../examples/config/image_generate_commands.sh.example`, and `../references/docs/image_generation_setup.md`.
-Stock sourcing templates are available in `../examples/config/slidemax_stock.env.example`, `../examples/config/register_stock_image.sh.example`, and `../references/docs/image_stock_sources.md`.
+Provider details are documented in `./image_generation_providers.md`.
+Credential and command templates are available in `../../examples/config/slidemax_image.env.example`, `../../examples/config/image_generate_commands.sh.example`, and `./image_generation_setup.md`.
+Stock sourcing templates are available in `../../examples/config/slidemax_stock.env.example`, `../../examples/config/register_stock_image.sh.example`, and `./image_stock_sources.md`.
 Commercial stock images should be normalized into `images/stock/` through `download_stock_image` or `register_stock_image` before Executor references them.
 
 ---
@@ -1457,7 +1458,7 @@ python3 skills/slidemax_workflow/scripts/slidemax.py register_stock_image worksp
 - 图片会统一落到项目 `images/stock/` 目录
 - 来源、许可证、作者和本地路径会写入 `images/stock/manifest.json`
 - Executor 应只引用本地路径，不直接热链第三方 URL
-- 详细规则见 `../references/docs/image_stock_sources.md`
+- 详细规则见 `./image_stock_sources.md`
 
 ---
 
@@ -1676,9 +1677,9 @@ pip install python-pptx
 
 ## 相关文档
 
-- [AGENTS 指南](../AGENTS.md)
-- [图片提示词指南](../references/docs/image_prompt_guidance.md)
-- [图片来源规范](../references/docs/image_stock_sources.md)
+- [AGENTS 指南](../../AGENTS.md)
+- [图片提示词指南](./image_prompt_guidance.md)
+- [图片来源规范](./image_stock_sources.md)
 
 ---
 

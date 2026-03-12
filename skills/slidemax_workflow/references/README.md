@@ -13,7 +13,8 @@ This directory is the documentation and reference hub for the `slidemax-workflow
 
 ## Maintenance Rules
 
-- Keep executable workflow logic and the canonical workflow handbook in `../AGENTS.md`, `../commands/`, and `../slidemax/`.
+- Keep executable workflow logic and the canonical workflow handbook in `../AGENTS.md`, `../scripts/`, and `../slidemax/`.
+- Keep command documentation in `./docs/command_reference.md`.
 - Keep `docs/` limited to topic-specific references or compatibility redirects.
 - Update template and asset sources under `../templates/`.
 - Do not recreate a second top-level `docs/` directory under the skill root.

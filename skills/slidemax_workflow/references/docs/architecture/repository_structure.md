@@ -11,8 +11,7 @@ skills/
 └── slidemax_workflow/  # Workflow-facing skill package
     ├── SKILL.md          # Skill entry description
     ├── AGENTS.md         # Canonical workflow handbook
-    ├── scripts/          # Canonical unified Python command tool
-    ├── commands/         # Command docs and non-Python fallback resources
+    ├── scripts/          # Canonical command scripts and fallback resources
     ├── slidemax/         # Canonical shared Python core and command registry
     ├── roles/            # Role protocols
     ├── workflows/        # Workflow entry documents
@@ -32,18 +31,18 @@ workspace/                # User project workspace (gitignored)
 ### 1. Skill owns workflow-facing assets
 
 - `skills/slidemax_workflow/scripts/slidemax.py` 是统一的 Python 命令入口。
-- `skills/slidemax_workflow/commands/` 只保留命令文档与非 Python fallback 资源。
+- `skills/slidemax_workflow/scripts/web_to_md.cjs` 是独立 Node fallback 的真实位置。
 - `skills/slidemax_workflow/slidemax/` 是共享 Python 核心与命令注册层的真实位置。
 - `skills/slidemax_workflow/AGENTS.md` 是 workflow 规范手册的真实位置。
 - `skills/slidemax_workflow/roles/`、`workflows/`、`templates/`、`examples/` 是相应资源的真实位置。
-- `skills/slidemax_workflow/references/docs/` 只保留专题参考文档与兼容跳转入口。
+- `skills/slidemax_workflow/references/docs/` 保留专题参考文档、兼容跳转入口与命令参考文档。
 - 样式资产（layouts、charts、icons、design spec references）统一收口在 `skills/slidemax_workflow/templates/`。
 - 根目录只保留最小入口文件与 `workspace/`，真实实现与资源全部收口在 skill 内。
 
 ### 2. Package-first imports
 
 - 新代码优先从 `slidemax.*` 导入共享能力。
-- 新增 Python 命令能力时，优先作为 `scripts/slidemax.py` 的子命令接入，而不是新增 `commands/*.py`。
+- 新增 Python 命令能力时，优先作为 `scripts/slidemax.py` 的子命令接入，而不是新增分散的脚本入口。
 - 共享逻辑优先沉到 `skills/slidemax_workflow/slidemax/`，统一入口只负责命令分发、参数桥接和编排。
 
 ### 3. Skill-only source of truth
@@ -198,7 +197,7 @@ workspace/                # User project workspace (gitignored)
 ## 后续建议
 
 1. 为 `skills/slidemax_workflow/workflows/` 增加更细粒度的专题 workflow
-2. 为 `slidemax.*` 补充自动化测试，并持续保持 `scripts/slidemax.py` 作为统一入口、`commands/` 作为文档与非 Python fallback 目录
+2. 为 `slidemax.*` 补充自动化测试，并持续保持 `scripts/slidemax.py` 作为统一入口、`references/docs/command_reference*.md` 作为命令文档、`scripts/web_to_md.cjs` 作为独立 Node fallback
 3. 保持根目录最小化，只在 skill 内持续演进 workflow 能力
 
 

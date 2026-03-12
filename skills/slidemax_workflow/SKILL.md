@@ -72,9 +72,10 @@ Need to work on a PPT task in this repository?
 - `workflows/generate-ppt.md` is a redirect entry, not a second workflow definition.
 - `roles/guides/` stores dense role reference material referenced by the role entry files.
 - `scripts/slidemax.py` is the canonical CLI surface.
-- `commands/` stores command documentation and the standalone Node fallback implementation.
+- `scripts/` stores the canonical CLI surface and standalone fallback scripts.
+- `references/docs/command_reference*.md` stores command documentation.
 - `slidemax/` contains reusable Python services and the shared command registry.
-- `web_to_md_cjs` remains the standalone Node fallback for protected sites and WeChat pages.
+- `web_to_md_cjs` remains the standalone Node fallback for protected sites and WeChat pages under `scripts/web_to_md.cjs`.
 - `workspace/` stores runtime projects and generated artifacts, not canonical workflow assets.
 - `references/docs/` stores topic-specific references and redirect entries only.
 - `references/` should stay documentation-focused and should not become a second workflow handbook.
@@ -88,7 +89,7 @@ Read in this order before executing or modifying a workflow task:
 3. The relevant stage playbook in `skills/slidemax_workflow/workflows/stages/` when stage detail is needed
 4. The required role file in `skills/slidemax_workflow/roles/`
 5. The matching role guide in `skills/slidemax_workflow/roles/guides/` when the role file points to one
-6. The relevant command documentation in `skills/slidemax_workflow/commands/README.md` when running or changing tooling
+6. The relevant command documentation in `skills/slidemax_workflow/references/docs/command_reference.md` when running or changing tooling
 7. The shared service implementation in `skills/slidemax_workflow/slidemax/` when the task is not command-only
 
 ## Stage Execution Map
@@ -102,7 +103,7 @@ Read in this order before executing or modifying a workflow task:
 | Stage 4 | Every PPT project | `roles/Strategist.md` | Project design-outline markdown file | `analyze_images` when user images exist |
 | Stage 5 | AI or stock images needed | `roles/Image_Generator.md` | `images/`, `images/stock/`, `images/image_prompts.md` | `image_generate`, `download_stock_image`, `register_stock_image`, `smoke_test_image_provider` |
 | Stage 6 | Slide production | Matching Executor role | `svg_output/`, `notes/total.md` | Role-driven generation |
-| Stage 7 | SVG output exists | `AGENTS.md`, `commands/README.md` | Split notes, `svg_final/`, `.pptx`, validation result | `total_md_split`, `finalize_svg`, `svg_to_pptx`, `project_manager validate` |
+| Stage 7 | SVG output exists | `AGENTS.md`, `references/docs/command_reference.md` | Split notes, `svg_final/`, `.pptx`, validation result | `total_md_split`, `finalize_svg`, `svg_to_pptx`, `project_manager validate` |
 | Stage 8 | User requests polish after a first draft | `roles/Optimizer_CRAP.md` | Improved SVG/PPTX | Re-run Stage 7 after optimizer edits |
 
 ## Reliability Rules
@@ -253,7 +254,7 @@ Output: Keep `skills/slidemax_workflow/` as the only workflow source of truth, r
 
 - `skills/slidemax_workflow/AGENTS.md` - Canonical workflow rules.
 - `skills/slidemax_workflow/workflows/generate-ppt.md` - Redirect entry.
-- `skills/slidemax_workflow/commands/README.md` - Command reference.
+- `skills/slidemax_workflow/references/docs/command_reference.md` - Command reference.
 - `skills/slidemax_workflow/references/docs/image_prompt_guidance.md` - Compact guide for drafting `images/image_prompts.md`.
 - `.agent/skills/ocr_image_to_markdown/SKILL.md` - OCR fallback for screenshots and image-based source material.
 - `skills/slidemax_workflow/roles/AGENTS.md` - Role map.
@@ -264,5 +265,5 @@ Output: Keep `skills/slidemax_workflow/` as the only workflow source of truth, r
 ## Skill Metadata
 
 - Created: 2026-03-07
-- Last Updated: 2026-03-11
-- Version: 1.2.2
+- Last Updated: 2026-03-12
+- Version: 1.3.1

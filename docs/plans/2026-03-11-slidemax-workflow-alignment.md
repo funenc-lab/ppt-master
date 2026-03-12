@@ -6,7 +6,7 @@
 
 **Architecture:** Treat `skills/slidemax_workflow/AGENTS.md` as the single canonical workflow contract, then make the runtime enforce the same delivery gates the docs promise. Keep command bridges thin, push reusable checks into `slidemax/`, and reduce prompt/document duplication by defining one canonical `image_prompts.md` schema that all role and reference docs reuse.
 
-**Tech Stack:** Python, unittest, Markdown workflow docs, thin CLI bridges under `skills/slidemax_workflow/commands/`
+**Tech Stack:** Python, unittest, Markdown workflow docs, unified CLI under `skills/slidemax_workflow/scripts/`
 
 ---
 
@@ -14,8 +14,8 @@
 
 **Files:**
 - Modify: `skills/slidemax_workflow/AGENTS.md`
-- Modify: `skills/slidemax_workflow/commands/README.md`
-- Modify: `skills/slidemax_workflow/commands/README_CN.md`
+- Modify: `skills/slidemax_workflow/references/docs/command_reference.md`
+- Modify: `skills/slidemax_workflow/references/docs/command_reference_cn.md`
 - Modify: `skills/slidemax_workflow/roles/AGENTS.md`
 - Test: `tests/test_project_management.py`
 
@@ -83,7 +83,7 @@ Expected:
 **Step 7: Commit**
 
 ```bash
-git add tests/test_project_management.py skills/slidemax_workflow/AGENTS.md skills/slidemax_workflow/commands/README.md skills/slidemax_workflow/commands/README_CN.md skills/slidemax_workflow/roles/AGENTS.md skills/slidemax_workflow/slidemax/project_management.py skills/slidemax_workflow/slidemax/project_utils.py
+git add tests/test_project_management.py skills/slidemax_workflow/AGENTS.md skills/slidemax_workflow/references/docs/command_reference.md skills/slidemax_workflow/references/docs/command_reference_cn.md skills/slidemax_workflow/roles/AGENTS.md skills/slidemax_workflow/slidemax/project_management.py skills/slidemax_workflow/slidemax/project_utils.py
 git commit -m "fix(slidemax-workflow): align delivery validation with workflow contract"
 ```
 
@@ -154,7 +154,7 @@ git commit -m "docs(slidemax-workflow): unify image prompt pack schema"
 ### Task 3: Remove workflow drift from command and role docs
 
 **Files:**
-- Modify: `skills/slidemax_workflow/commands/README_CN.md`
+- Modify: `skills/slidemax_workflow/references/docs/command_reference_cn.md`
 - Modify: `skills/slidemax_workflow/roles/Strategist.md`
 - Modify: `skills/slidemax_workflow/roles/Executor_General.md`
 - Modify: `skills/slidemax_workflow/roles/Executor_Consultant.md`
@@ -216,7 +216,7 @@ Expected:
 **Step 6: Commit**
 
 ```bash
-git add skills/slidemax_workflow/commands/README_CN.md skills/slidemax_workflow/roles/Strategist.md skills/slidemax_workflow/roles/Executor_General.md skills/slidemax_workflow/roles/Executor_Consultant.md skills/slidemax_workflow/roles/Executor_Consultant_Top.md skills/slidemax_workflow/AGENTS.md skills/slidemax_workflow/slidemax/project_utils.py
+git add skills/slidemax_workflow/references/docs/command_reference_cn.md skills/slidemax_workflow/roles/Strategist.md skills/slidemax_workflow/roles/Executor_General.md skills/slidemax_workflow/roles/Executor_Consultant.md skills/slidemax_workflow/roles/Executor_Consultant_Top.md skills/slidemax_workflow/AGENTS.md skills/slidemax_workflow/slidemax/project_utils.py
 git commit -m "docs(slidemax-workflow): remove workflow and naming drift"
 ```
 

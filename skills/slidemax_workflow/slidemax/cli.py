@@ -167,7 +167,7 @@ def build_registry() -> Dict[str, CommandSpec]:
             name="web_to_md_cjs",
             summary="Run the Node fallback for protected web pages.",
             category="Source Conversion",
-            runner=_build_external_runner("node", SKILL_ROOT / "commands" / "web_to_md.cjs"),
+            runner=_build_external_runner("node", SKILL_ROOT / "scripts" / "web_to_md.cjs"),
             aliases=("web_to_md_js",),
         ),
         CommandSpec(

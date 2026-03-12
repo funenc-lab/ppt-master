@@ -9,8 +9,11 @@ Before performing any PPT workflow task, read:
 Use the command tool under:
 - `skills/slidemax_workflow/scripts/slidemax.py`
 
-Use the command documentation and non-Python fallback resources under:
-- `skills/slidemax_workflow/commands/`
+Use the command reference under:
+- `skills/slidemax_workflow/references/docs/command_reference.md`
+
+Use the standalone Node fallback under:
+- `skills/slidemax_workflow/scripts/web_to_md.cjs`
 
 Use the shared Python core under:
 - `skills/slidemax_workflow/slidemax/`

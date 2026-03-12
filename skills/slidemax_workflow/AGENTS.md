@@ -134,7 +134,7 @@ Use these documents for detailed stage execution.
 | Stage 4 | Every PPT project | `roles/Strategist.md`, Stage 4-5 playbook | Project design brief | `analyze_images` when user images exist |
 | Stage 5 | AI or stock images needed | `roles/Image_Generator.md`, Stage 4-5 playbook | `images/`, `images/stock/`, `images/image_prompts.md` | `image_generate`, `download_stock_image`, `register_stock_image`, `smoke_test_image_provider` |
 | Stage 6 | Slide production | Matching Executor role, Stage 6-8 playbook | `svg_output/`, `notes/total.md` | Role-driven generation |
-| Stage 7 | SVG output exists | Stage 6-8 playbook, `commands/README.md` | Split notes, `svg_final/`, `.pptx`, validation result | `total_md_split`, `finalize_svg`, `svg_to_pptx`, `project_manager validate` |
+| Stage 7 | SVG output exists | Stage 6-8 playbook, `references/docs/command_reference.md` | Split notes, `svg_final/`, `.pptx`, validation result | `total_md_split`, `finalize_svg`, `svg_to_pptx`, `project_manager validate` |
 | Stage 8 | User requests polish after a first draft | `roles/Optimizer_CRAP.md`, Stage 6-8 playbook | Improved SVG/PPTX | Re-run Stage 7 after optimizer edits |
 
 # Rulebook
@@ -351,7 +351,7 @@ project/
 | Image setup | `skills/slidemax_workflow/references/docs/image_generation_setup.md` |
 | Image prompt guidance | `skills/slidemax_workflow/references/docs/image_prompt_guidance.md` |
 | Example projects | `skills/slidemax_workflow/examples/` |
-| Command reference | `skills/slidemax_workflow/commands/README.md` |
+| Command reference | `skills/slidemax_workflow/references/docs/command_reference.md` |
 
 ## AI Agent Notes
 

@@ -1,14 +1,15 @@
 # SlideMax Command Reference
 
-[中文](./README_CN.md) | English
+[中文](./command_reference_cn.md) | English
 
-This directory documents the SlideMax command surface and keeps non-Python command resources.
+This document describes the SlideMax command surface and points to the canonical runtime scripts.
 
 ## Current Rules
 
 - Use `skills/slidemax_workflow/scripts/slidemax.py` as the canonical command tool.
 - Use `skills/slidemax_workflow/slidemax/` as the shared Python core and command registry.
-- Treat `skills/slidemax_workflow/commands/` as documentation plus the standalone Node fallback implementation.
+- Use `skills/slidemax_workflow/references/docs/command_reference*.md` as the command documentation.
+- Keep `skills/slidemax_workflow/scripts/web_to_md.cjs` as the standalone Node fallback implementation.
 - When command behavior changes, update the unified tool and shared core first, then reconcile the docs.
 
 ## Operational Command Quickstart
@@ -143,8 +144,8 @@ python3 skills/slidemax_workflow/scripts/slidemax.py project_manager validate wo
 
 ## Related Resources
 
-- [Workflow Rules](../AGENTS.md)
-- [Workflow Index](../workflows/README.md)
-- [Image Prompt Guidance](../references/docs/image_prompt_guidance.md)
-- [Role Definitions](../roles/AGENTS.md)
-- [Chart Templates](../templates/charts/README.md)
+- [Workflow Rules](../../AGENTS.md)
+- [Workflow Index](../../workflows/README.md)
+- [Image Prompt Guidance](./image_prompt_guidance.md)
+- [Role Definitions](../../roles/AGENTS.md)
+- [Chart Templates](../../templates/charts/README.md)

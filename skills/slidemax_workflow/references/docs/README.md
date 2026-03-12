@@ -18,5 +18,5 @@ Read [AGENTS.md](../../AGENTS.md) for:
 Related quick links:
 
 - [Workflow redirect entry](../../workflows/generate-ppt.md)
-- [Commands reference](../../commands/README.md)
+- [Commands reference](./command_reference.md)
 - [Role definitions](../../roles/AGENTS.md)

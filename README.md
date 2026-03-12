@@ -29,7 +29,7 @@ pip install -r requirements.txt
 
 - Workflow handbook: [`skills/slidemax_workflow/AGENTS.md`](./skills/slidemax_workflow/AGENTS.md)
 - Skill entry: [`skills/slidemax_workflow/SKILL.md`](./skills/slidemax_workflow/SKILL.md)
-- Commands reference: [`skills/slidemax_workflow/commands/README.md`](./skills/slidemax_workflow/commands/README.md)
+- Commands reference: [`skills/slidemax_workflow/references/docs/command_reference.md`](./skills/slidemax_workflow/references/docs/command_reference.md)
 - Role definitions: [`skills/slidemax_workflow/roles/AGENTS.md`](./skills/slidemax_workflow/roles/AGENTS.md)
 - Examples index: [`skills/slidemax_workflow/examples/README.md`](./skills/slidemax_workflow/examples/README.md)
 
@@ -46,5 +46,5 @@ slidemax/
 ## Notes
 
 - Do not treat this README as a second workflow manual.
-- Prefer `skills/slidemax_workflow/commands/` as the command entry surface.
+- Prefer `skills/slidemax_workflow/scripts/slidemax.py` as the command entry surface and `skills/slidemax_workflow/references/docs/command_reference.md` as the command manual.
 - Use `skills/slidemax_workflow/AGENTS.md` when explaining, running, or editing the workflow.

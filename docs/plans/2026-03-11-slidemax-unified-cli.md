@@ -2,9 +2,9 @@
 
 > **For Claude:** REQUIRED SUB-SKILL: Use executing-plans to implement this plan task-by-task.
 
-**Goal:** Introduce a single SlideMax command tool that dispatches the full workflow command surface through one stable entrypoint and removes Python command files from `commands/`.
+**Goal:** Introduce a single SlideMax command tool that dispatches the full workflow command surface through one stable entrypoint and removes legacy per-command Python entrypoints.
 
-**Architecture:** Add a shared CLI registry under `skills/slidemax_workflow/slidemax/cli.py` and expose it through `skills/slidemax_workflow/scripts/slidemax.py`. Move the canonical Python command surface into `scripts/`, keep reusable logic in `slidemax/`, and leave `commands/` for documentation plus non-Python fallback resources only.
+**Architecture:** Add a shared CLI registry under `skills/slidemax_workflow/slidemax/cli.py` and expose it through `skills/slidemax_workflow/scripts/slidemax.py`. Move the canonical Python command surface into `scripts/`, keep reusable logic in `slidemax/`, store command documentation in `skills/slidemax_workflow/references/docs/command_reference*.md`, and keep the standalone Node fallback in `skills/slidemax_workflow/scripts/web_to_md.cjs`.
 
 **Tech Stack:** Python 3, `argparse`, `importlib`, `subprocess`, `unittest`
 
@@ -44,20 +44,20 @@ Implement:
 
 **Step 2: Remove duplicated Python entrypoints**
 
-Delete `commands/*.py` after the registry covers the full command surface and the documentation has been updated.
+Delete legacy per-command Python entrypoints after the registry covers the full command surface and the documentation has been updated.
 
 ### Task 3: Update command documentation
 
 **Files:**
-- Modify: `skills/slidemax_workflow/commands/README.md`
-- Modify: `skills/slidemax_workflow/commands/README_CN.md`
+- Modify: `skills/slidemax_workflow/references/docs/command_reference.md`
+- Modify: `skills/slidemax_workflow/references/docs/command_reference_cn.md`
 
 **Step 1: Document the new canonical entrypoint**
 
 Add:
 - `python3 skills/slidemax_workflow/scripts/slidemax.py list`
 - `python3 skills/slidemax_workflow/scripts/slidemax.py <command> ...`
-- note that `commands/` no longer stores Python entrypoints
+- note that legacy per-command entrypoints no longer exist
 
 ### Task 4: Verify the change
 
@@ -76,4 +76,4 @@ Run:
 Confirm:
 - all new CLI tests pass
 - shared bridge behavior remains green
-- `commands/` contains no `.py` files
+- no legacy per-command Python entrypoint files remain
