@@ -27,7 +27,7 @@
 ```
 ppt169_咨询风_南欧江水电站战略评估/
 ├── README.md                    # 本文件
-├── 设计规范与内容大纲.md         # 详细设计规范
+├── 设计规范与内容大纲.md         # 示例中保留的历史文件名；当前工作流推荐 design_specification.md
 ├── images/                      # 图片资源
 │   ├── cover_dam.png           # 封面背景
 │   ├── laos_map.png            # 老挝地图

@@ -5,10 +5,11 @@ SlideMax - 项目工具公共模块
 提供项目信息解析、验证等公共功能，供其他工具复用。
 """
 
+import argparse
 import re
 from pathlib import Path
 from datetime import datetime
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Sequence, Tuple
 
 # 画布格式定义（统一来源）
 try:
@@ -122,7 +123,9 @@ def parse_project_name(dir_name: str) -> Dict[str, str]:
         if normalized_format in CANVAS_FORMATS:
             result['format'] = normalized_format
             result['format_name'] = CANVAS_FORMATS[normalized_format]['name']
-            result['name'] = dir_name[:len(full_match.group('name'))]
+            name = dir_name[:len(full_match.group('name'))]
+            name = re.sub(rf'^{re.escape(normalized_format)}_', '', name, flags=re.IGNORECASE)
+            result['name'] = name
             return result
 
     # 兜底：只匹配末尾 `_format`，避免误删项目名内部片段
@@ -133,11 +136,21 @@ def parse_project_name(dir_name: str) -> Dict[str, str]:
             result['format_name'] = CANVAS_FORMATS[fmt_key]['name']
             break
 
-    # 提取项目名称（仅移除末尾日期和格式后缀）
+    # Extract the display name by removing recognized format markers.
     name = re.sub(r'_\d{8}$', '', dir_name)
     if result['format'] != 'unknown':
         name = re.sub(rf'_{re.escape(result["format"])}$', '', name, flags=re.IGNORECASE)
+        name = re.sub(rf'^{re.escape(result["format"])}_', '', name, flags=re.IGNORECASE)
     result['name'] = name
+
+    if result['format'] == 'unknown':
+        for fmt_key in sorted_formats:
+            if re.match(rf'^{re.escape(fmt_key)}_', dir_name_lower):
+                result['format'] = fmt_key
+                result['format_name'] = CANVAS_FORMATS[fmt_key]['name']
+                name = re.sub(rf'^{re.escape(fmt_key)}_', '', re.sub(r'_\d{8}$', '', dir_name), flags=re.IGNORECASE)
+                result['name'] = name
+                break
 
     return result
 
@@ -256,7 +269,7 @@ def validate_project_structure(project_path: str, verbose: bool = False) -> Tupl
     spec_files = ['设计规范与内容大纲.md', 'design_specification.md', '设计规范.md']
     has_spec = any((project_path / f).exists() for f in spec_files)
     if not has_spec:
-        msg = "缺少设计规范文件（建议文件名: 设计规范与内容大纲.md）"
+        msg = "缺少设计规范文件（建议文件名: design_specification.md）"
         if use_helper and verbose:
             msg += "\n" + ErrorHelper.format_error_message('missing_spec')
         warnings.append(msg)
@@ -435,12 +448,30 @@ def get_project_stats(project_path: str) -> Dict:
     return stats
 
 
-def main() -> None:
-    """Command-line entry for project utility diagnostics."""
-    import sys
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        prog='python3 skills/slidemax_workflow/scripts/slidemax.py project_utils',
+        description='Inspect shared project utility diagnostics.',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog='''
+When to use:
+  - Inspect one project quickly when you need shared utility diagnostics outside the full project manager flow
+  - Use this for low-level project structure and metadata inspection
 
-    if len(sys.argv) > 1:
-        project_path = sys.argv[1]
+Examples:
+  %(prog)s workspace/demo_ppt169_20260308
+''',
+    )
+    parser.add_argument('project_path', nargs='?', help='Project directory path')
+    return parser
+
+
+def run_cli(argv: Optional[Sequence[str]] = None) -> int:
+    parser = build_parser()
+    args = parser.parse_args(list(argv) if argv is not None else None)
+
+    if args.project_path:
+        project_path = args.project_path
         info = get_project_info(project_path)
 
         print(f"\nProject info: {info['dir_name']}")
@@ -468,8 +499,16 @@ def main() -> None:
 
         if is_valid and not warnings:
             print("Project structure is valid")
-    else:
-        print("Usage: python3 project_utils.py <project_path>")
+        return 0
+
+    parser.print_help()
+    return 0
+
+
+def main(argv: Optional[Sequence[str]] = None) -> None:
+    """Command-line entry for project utility diagnostics."""
+
+    raise SystemExit(run_cli(argv))
 
 
 __all__ = [
@@ -483,7 +522,9 @@ __all__ = [
     'find_all_projects',
     'format_file_size',
     'get_project_stats',
+    'build_parser',
     'main',
+    'run_cli',
 ]
 
 

@@ -12,13 +12,14 @@ from pathlib import Path
 from typing import Dict, List, Optional, Sequence, Tuple
 
 from .config import WORKSPACE_DIR
-from .exporters.pptx_assets import get_png_renderer_info
+from .exporters.pptx_assets import find_notes_files, get_png_renderer_info
 from .image_generation import (
     ImageGenerationRequest,
     generate_image,
     provider_sdk_dependency_status,
     resolve_provider_config,
 )
+from .notes_splitter import parse_total_md
 from .pptx_export import Presentation
 from .project_utils import (
     CANVAS_FORMATS,
@@ -125,21 +126,24 @@ class ProjectManager:
         return str(project_path)
 
     def validate_project(self, project_path: str | Path) -> Tuple[bool, List[str], List[str]]:
-        """Validate a project's structure and SVG viewBox consistency."""
+        """Validate a project's delivery readiness and SVG viewBox consistency."""
 
         project_path_obj = Path(project_path)
         is_valid, errors, warnings = validate_project_structure(str(project_path_obj))
+        svg_files = _find_svg_output_files(project_path_obj)
 
-        if project_path_obj.exists() and project_path_obj.is_dir():
+        if project_path_obj.exists() and project_path_obj.is_dir() and svg_files:
             info = get_project_info_common(str(project_path_obj))
-            if info.get('svg_files'):
-                svg_files = [project_path_obj / 'svg_output' / filename for filename in info['svg_files']]
-                expected_format = info.get('format')
-                if expected_format == 'unknown':
-                    expected_format = None
-                warnings.extend(validate_svg_viewbox(svg_files, expected_format))
+            expected_format = info.get('format')
+            if expected_format == 'unknown':
+                expected_format = None
+            warnings.extend(validate_svg_viewbox(svg_files, expected_format))
 
-        return is_valid, errors, warnings
+            delivery_errors, delivery_warnings = _collect_delivery_errors(project_path_obj, svg_files)
+            errors.extend(delivery_errors)
+            warnings.extend(delivery_warnings)
+
+        return len(errors) == 0 and is_valid, errors, warnings
 
     def get_project_info(self, project_path: str | Path) -> Dict[str, object]:
         """Return summarized project metadata."""
@@ -235,6 +239,93 @@ def _collect_template_check(project_path: Path) -> PreflightCheck:
         status='ok',
         message=f'Validated {len(template_svgs)} template SVG file(s).',
     )
+
+
+def _find_svg_output_files(project_path: Path) -> List[Path]:
+    """Return current raw SVG slides for validation flows."""
+
+    svg_output_dir = project_path / 'svg_output'
+    if not svg_output_dir.exists():
+        return []
+    return sorted(svg_output_dir.glob('*.svg'))
+
+
+def _collect_delivery_notes_result(project_path: Path, svg_files: List[Path]) -> Tuple[List[str], List[str]]:
+    """Validate that speaker notes cover every current slide."""
+
+    warnings: List[str] = []
+    if not svg_files:
+        return [], warnings
+
+    notes_map = find_notes_files(project_path, svg_files)
+    missing_stems = [svg_path.stem for svg_path in svg_files if svg_path.stem not in notes_map]
+    if not missing_stems:
+        return [], warnings
+
+    total_md_path = project_path / 'notes' / 'total.md'
+    if total_md_path.exists():
+        parsed_notes = parse_total_md(total_md_path, [svg_path.stem for svg_path in svg_files], False)
+        missing_from_total = [svg_path.stem for svg_path in svg_files if svg_path.stem not in parsed_notes]
+        if not missing_from_total:
+            warnings.append(
+                'Speaker notes are only present in notes/total.md. '
+                'Run total_md_split.py before delivery for explicit per-slide note files.'
+            )
+            return [], warnings
+
+    return [
+        'Missing speaker notes for slide(s): '
+        + ', '.join(missing_stems)
+        + '. Generate per-slide notes or provide a complete notes/total.md.'
+    ], warnings
+
+
+def _collect_delivery_svg_final_errors(project_path: Path, svg_files: List[Path]) -> List[str]:
+    """Validate that finalized SVG output exists for every current slide."""
+
+    if not svg_files:
+        return []
+
+    svg_final_dir = project_path / 'svg_final'
+    if not svg_final_dir.exists():
+        return ['Missing svg_final/ directory required for finalized delivery assets.']
+
+    finalized_stems = {svg_path.stem for svg_path in svg_final_dir.glob('*.svg')}
+    missing_stems = [svg_path.stem for svg_path in svg_files if svg_path.stem not in finalized_stems]
+    if not missing_stems:
+        return []
+
+    return [
+        'Missing finalized SVG file(s) under svg_final/: '
+        + ', '.join(f'{stem}.svg' for stem in missing_stems)
+    ]
+
+
+def _collect_delivery_pptx_errors(project_path: Path, svg_files: List[Path]) -> List[str]:
+    """Validate that a PPTX export exists for projects with slide output."""
+
+    if not svg_files:
+        return []
+
+    pptx_files = sorted(project_path.glob('*.pptx'))
+    if pptx_files:
+        return []
+
+    return ['Missing exported PPTX file (*.pptx) in the project root.']
+
+
+def _collect_delivery_errors(project_path: Path, svg_files: List[Path]) -> Tuple[List[str], List[str]]:
+    """Collect strict delivery validation results for `validate`."""
+
+    errors: List[str] = []
+    warnings: List[str] = []
+
+    note_errors, note_warnings = _collect_delivery_notes_result(project_path, svg_files)
+    errors.extend(note_errors)
+    warnings.extend(note_warnings)
+    errors.extend(_collect_delivery_svg_final_errors(project_path, svg_files))
+    errors.extend(_collect_delivery_pptx_errors(project_path, svg_files))
+    return errors, warnings
 
 
 def build_preflight_checks(
@@ -407,9 +498,16 @@ def build_parser() -> argparse.ArgumentParser:
     """Build the CLI parser for the project manager."""
 
     parser = argparse.ArgumentParser(
+        prog='python3 skills/slidemax_workflow/scripts/slidemax.py project_manager',
         description='SlideMax project manager',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog='''
+When to use:
+  - init: create a new workspace project before any SVG, notes, or image assets are written
+  - info: inspect an existing project quickly
+  - doctor: run preflight checks before generation or provider setup
+  - validate: enforce the final delivery gate before claiming completion
+
 Examples:
   %(prog)s init my_project --format ppt169
   %(prog)s validate workspace/my_project_ppt169_20260308
@@ -487,13 +585,13 @@ def run_cli(argv: Optional[Sequence[str]] = None) -> int:
                 print(f'  - {warning}')
 
         if is_valid and not warnings:
-            print('\n[OK] Project structure is complete with no issues')
+            print('\n[OK] Delivery validation passed with no issues')
             return 0
         if is_valid:
-            print('\n[OK] Project structure is valid with recommendations')
+            print('\n[OK] Delivery validation passed with recommendations')
             return 0
 
-        print('\n[ERROR] Project structure is invalid; please fix the reported errors')
+        print('\n[ERROR] Delivery validation failed; please fix the reported errors')
         return 1
 
     if args.command == 'info':

@@ -172,7 +172,7 @@ class BatchValidator:
                 print('  2. Check SVG viewBox settings and align them with the canvas format')
             if self.summary['missing_spec'] > 0:
                 print('  3. Add the design specification file')
-                print('     Recommended name: design_specification.md or the workflow default spec filename')
+                print('     Recommended name: design_specification.md')
 
     def _percentage(self, count: int) -> int:
         if self.summary['total'] == 0:
@@ -224,9 +224,14 @@ def build_parser() -> argparse.ArgumentParser:
     """Build the CLI parser for batch project validation."""
 
     parser = argparse.ArgumentParser(
+        prog='python3 skills/slidemax_workflow/scripts/slidemax.py batch_validate',
         description='SlideMax batch project validator',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog='''
+When to use:
+  - Validate multiple projects in one pass before a bulk review or release sweep
+  - Use `--all` to scan built-in examples, extra example roots, and workspace projects together
+
 Examples:
   %(prog)s skills/slidemax_workflow/examples
   %(prog)s skills/slidemax_workflow/examples workspace

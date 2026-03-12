@@ -9,7 +9,8 @@ if str(SKILL_ROOT) not in sys.path:
     sys.path.insert(0, str(SKILL_ROOT))
 
 from slidemax.config import CANVAS_FORMATS
-from slidemax.exporters.pptx_assets import get_slide_dimensions
+from slidemax.exporters.pptx_assets import find_notes_files, get_slide_dimensions
+from slidemax.notes_splitter import run_cli as run_notes_splitter_cli
 from slidemax.pptx_export import (
     DEFAULT_TRANSITION_CHOICES,
     build_cli_parser,
@@ -80,6 +81,42 @@ class PptxExportTestCase(unittest.TestCase):
             self.assertIn("01_封面", context.notes)
             self.assertEqual(context.notes["01_封面"], "hello export notes")
             self.assertTrue((project / "notes" / "01_封面.md").exists())
+
+    def test_find_notes_files_reads_legacy_slide_number_files(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            project = Path(tmp) / "demo_ppt169_20260308"
+            (project / "svg_output").mkdir(parents=True)
+            (project / "notes").mkdir()
+            svg_path = project / "svg_output" / "01_封面.svg"
+            svg_path.write_text(
+                '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720"></svg>',
+                encoding="utf-8",
+            )
+            (project / "notes" / "slide01.md").write_text("legacy note\n", encoding="utf-8")
+
+            notes = find_notes_files(project, [svg_path])
+
+        self.assertEqual(notes["01_封面"], "legacy note")
+
+    def test_notes_splitter_writes_svg_stem_note_files(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            project = Path(tmp) / "demo_ppt169_20260308"
+            (project / "svg_output").mkdir(parents=True)
+            (project / "notes").mkdir()
+            (project / "svg_output" / "01_封面.svg").write_text(
+                '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720"></svg>',
+                encoding="utf-8",
+            )
+            (project / "notes" / "total.md").write_text(
+                "# 01 封面\nhello export notes\n",
+                encoding="utf-8",
+            )
+
+            exit_code = run_notes_splitter_cli([str(project), "-q"])
+
+            self.assertEqual(exit_code, 0)
+            self.assertTrue((project / "notes" / "01_封面.md").exists())
+            self.assertFalse((project / "notes" / "slide01.md").exists())
 
 
 if __name__ == "__main__":

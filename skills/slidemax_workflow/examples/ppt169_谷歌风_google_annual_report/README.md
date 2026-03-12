@@ -171,7 +171,7 @@ python3 -m http.server --directory svg_output 8000
 ppt169_谷歌风_google_annual_report/
 ├── README.md                    # 项目说明文档
 ├── 来源文档.md                  # 假设的工作内容数据
-├── 设计规范与内容大纲.md        # 完整设计规范
+├── 设计规范与内容大纲.md        # 示例中保留的历史文件名；当前工作流推荐 design_specification.md
 ├── preview.html                 # 预览页面
 └── svg_output/                  # SVG 输出文件
     ├── slide_01_cover.svg

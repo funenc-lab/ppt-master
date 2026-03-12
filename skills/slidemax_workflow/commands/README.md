@@ -2,13 +2,14 @@
 
 [中文](./README_CN.md) | English
 
-This directory contains the canonical command entry points for the SlideMax workflow.
+This directory documents the SlideMax command surface and keeps non-Python command resources.
 
 ## Current Rules
 
-- Use `skills/slidemax_workflow/commands/` as the canonical command surface.
-- Use `skills/slidemax_workflow/slidemax/` as the shared Python core.
-- When command behavior changes, update command bridges and shared core first, then reconcile the docs.
+- Use `skills/slidemax_workflow/scripts/slidemax.py` as the canonical command tool.
+- Use `skills/slidemax_workflow/slidemax/` as the shared Python core and command registry.
+- Treat `skills/slidemax_workflow/commands/` as documentation plus the standalone Node fallback implementation.
+- When command behavior changes, update the unified tool and shared core first, then reconcile the docs.
 
 ## Operational Command Quickstart
 
@@ -17,19 +18,22 @@ This directory contains the canonical command entry points for the SlideMax work
 ```text
 Start a PPT workflow task
   -> Normalize source
-     -> PDF: `pdf_to_md.py`
-     -> URL: `web_to_md.py` or `web_to_md.cjs`
+     -> PDF: `pdf_to_md`
+     -> URL: `web_to_md` or `web_to_md_cjs`
      -> Screenshot/image document: OCR skill `.agent/skills/ocr_image_to_markdown/SKILL.md`
      -> Markdown/Text: use directly
-  -> Create project: `project_manager.py init`
+  -> Create project: `project_manager init`
   -> Produce strategy and role outputs
   -> Acquire images when needed
-     -> AI image: `image_generate.py`
-     -> Provider smoke test: `smoke_test_image_provider.py`
-     -> Stock image: `download_stock_image.py` / `register_stock_image.py`
-  -> Finalize SVG: `finalize_svg.py`
-  -> Export PPTX: `svg_to_pptx.py -s final`
-  -> Validate project: `project_manager.py validate` or `batch_validate.py`
+     -> User-supplied image analysis: `analyze_images`
+     -> AI image: `image_generate`
+     -> Provider smoke test: `smoke_test_image_provider`
+     -> Stock image: `download_stock_image` / `register_stock_image`
+     -> Provenance and risk audit: `register_image_source` / `audit_image_asset`
+  -> Split notes explicitly: `total_md_split`
+  -> Finalize SVG: `finalize_svg`
+  -> Export PPTX: `svg_to_pptx -s final`
+  -> Validate delivery: `project_manager validate` or `batch_validate`
 ```
 
 ### Command Decision Flow
@@ -37,86 +41,102 @@ Start a PPT workflow task
 ```text
 What is the immediate task?
 |
-+-- Convert source material ----------------> `pdf_to_md.py` / `web_to_md.py` / `web_to_md.cjs`
++-- Convert source material ----------------> `pdf_to_md` / `web_to_md` / `web_to_md_cjs`
 +-- Transcribe screenshots / image docs ---> OCR skill `.agent/skills/ocr_image_to_markdown/SKILL.md`
-+-- Create or inspect a project -----------> `project_manager.py init|validate|info`
-+-- Generate or verify images -------------> `image_generate.py` / `smoke_test_image_provider.py`
-+-- Register stock assets -----------------> `download_stock_image.py` / `register_stock_image.py`
-+-- Fix or finalize SVG -------------------> `finalize_svg.py`
-+-- Export PPTX ---------------------------> `svg_to_pptx.py -s final`
-+-- Diagnose quality ----------------------> `svg_quality_checker.py` / `batch_validate.py` / `error_helper.py`
++-- Create or inspect a project -----------> `project_manager init|validate|info|doctor`
++-- Analyze user image assets -------------> `analyze_images`
++-- Generate or verify images -------------> `image_generate` / `smoke_test_image_provider`
++-- Fix image orientation -----------------> `rotate_images`
++-- Register stock assets -----------------> `download_stock_image` / `register_stock_image`
++-- Record asset provenance ---------------> `register_image_source` / `audit_image_asset`
++-- Split notes before delivery -----------> `total_md_split`
++-- Fix or finalize SVG -------------------> `finalize_svg`
++-- Export PPTX ---------------------------> `svg_to_pptx -s final`
++-- Diagnose quality ----------------------> `svg_quality_checker` / `batch_validate` / `error_helper`
++-- Install export environment -----------> `setup_export_env`
 ```
 
 ## Reliable Default Commands
 
 ```bash
 # 1. Create a project
-python3 skills/slidemax_workflow/commands/project_manager.py init my_project --format ppt169
+python3 skills/slidemax_workflow/scripts/slidemax.py project_manager init my_project --format ppt169
 
-# 2. Smoke test an image provider before relying on it
-python3 skills/slidemax_workflow/commands/smoke_test_image_provider.py --provider gemini --output workspace/my_project/images
+# 2. Assume the created project path is workspace/my_project_ppt169_YYYYMMDD
 
-# 3. Finalize generated SVG
-python3 skills/slidemax_workflow/commands/finalize_svg.py workspace/my_project_ppt169_YYYYMMDD
+# 3. Smoke test an image provider before relying on it
+python3 skills/slidemax_workflow/scripts/slidemax.py smoke_test_image_provider --provider gemini --output workspace/my_project_ppt169_YYYYMMDD/images
 
-# 4. Export finalized SVG to PPTX
-python3 skills/slidemax_workflow/commands/svg_to_pptx.py workspace/my_project_ppt169_YYYYMMDD -s final
+# 4. Split notes explicitly before delivery
+python3 skills/slidemax_workflow/scripts/slidemax.py total_md_split workspace/my_project_ppt169_YYYYMMDD
 
-# 5. Validate the project before completion claims
-python3 skills/slidemax_workflow/commands/project_manager.py validate workspace/my_project_ppt169_YYYYMMDD
+# 5. Finalize generated SVG
+python3 skills/slidemax_workflow/scripts/slidemax.py finalize_svg workspace/my_project_ppt169_YYYYMMDD
+
+# 6. Export finalized SVG to PPTX
+python3 skills/slidemax_workflow/scripts/slidemax.py svg_to_pptx workspace/my_project_ppt169_YYYYMMDD -s final
+
+# 7. Validate the project before completion claims
+python3 skills/slidemax_workflow/scripts/slidemax.py project_manager validate workspace/my_project_ppt169_YYYYMMDD
 ```
 
 ## Command Groups
 
 ### Source Conversion
 
-- `pdf_to_md.py` - Convert PDF documents to Markdown
-- `web_to_md.py` - Convert standard web pages to Markdown
-- `web_to_md.cjs` - Convert harder web targets such as WeChat pages
+- `pdf_to_md` - Convert PDF documents to Markdown
+- `web_to_md` - Convert standard web pages to Markdown
+- `web_to_md_cjs` - Standalone Node fallback for harder web targets such as WeChat pages
 
 ### Project Management
 
-- `project_manager.py` - Create, inspect, and validate projects
-- `project_utils.py` - Project utility bridge and helpers
-- `generate_examples_index.py` - Regenerate the examples index
+- `project_manager` - Create projects, run preflight checks, and validate final delivery outputs
+- `project_utils` - Project utility bridge and helpers
+- `generate_examples_index` - Regenerate the examples index
 
 ### Image and Media
 
-- `analyze_images.py` - Analyze local image assets and generate a CSV inventory
-- `image_generate.py` - Provider-neutral image generation entry
-- `nano_banana_gen.py` - Legacy Gemini-compatible image generation wrapper
-- `smoke_test_image_provider.py` - Validate live image provider configuration
-- `register_stock_image.py` - Register an existing stock asset into `images/stock/manifest.json`
-- `download_stock_image.py` - Download and register a stock asset into `images/stock/manifest.json`
-- `gemini_watermark_remover.py` - Remove Gemini star watermark assets
-- `doubao_i2v_task.py` - ARK image-to-video task CLI
+- `analyze_images` - Analyze local image assets and generate a CSV inventory
+- `image_generate` - Provider-neutral image generation entry
+- `nano_banana_gen` - Legacy Gemini-compatible image generation wrapper
+- `smoke_test_image_provider` - Validate live image provider configuration
+- `register_image_source` - Write or update provenance sidecars for local image assets
+- `register_stock_image` - Register an existing stock asset into `images/stock/manifest.json`
+- `download_stock_image` - Download and register a stock asset into `images/stock/manifest.json`
+- `rotate_images` - Rotate local image assets and apply recorded fixes
+- `audit_image_asset` - Audit watermark and provenance risk before delivery
+- `gemini_watermark_remover` - Remove Gemini star watermark assets
+- `doubao_i2v_task` - ARK image-to-video task CLI
 
 ### SVG Finalization and Helpers
 
-- `finalize_svg.py` - Canonical SVG finalization entry
-- `embed_icons.py` - Replace icon placeholders with local SVG icons
-- `crop_images.py` - Crop slice-mode image references into prepared assets
-- `fix_image_aspect.py` - Adjust image frames to preserve aspect ratio
-- `embed_images.py` - Inline raster image assets into SVG files
-- `flatten_tspan.py` - Flatten `tspan`-based text nodes
-- `svg_rect_to_path.py` - Convert rounded rectangles into plain path geometry
-- `svg_position_calculator.py` - Validate and calculate chart-safe SVG layout positions
+- `finalize_svg` - Canonical SVG finalization entry
+- `embed_icons` - Replace icon placeholders with local SVG icons
+- `crop_images` - Crop slice-mode image references into prepared assets
+- `fix_image_aspect` - Adjust image frames to preserve aspect ratio
+- `embed_images` - Inline raster image assets into SVG files
+- `flatten_tspan` - Flatten `tspan`-based text nodes
+- `svg_rect_to_path` - Convert rounded rectangles into plain path geometry
+- `svg_position_calculator` - Validate and calculate chart-safe SVG layout positions
 
 ### Export and Validation
 
-- `svg_to_pptx.py` - Export SVG slides to PPTX
-- `pptx_animations.py` - PPTX transition and animation compatibility helpers
-- `svg_quality_checker.py` - Validate SVG compliance and detect compatibility issues
-- `batch_validate.py` - Batch validation entry
-- `error_helper.py` - Human-readable error explanations and fix hints
-- `config.py` - Inspect shared configuration and canvas definitions
-- `total_md_split.py` - Split speaker notes into per-slide note files
+- `svg_to_pptx` - Export SVG slides to PPTX
+- `svg_quality_checker` - Validate SVG compliance and detect compatibility issues
+- `batch_validate` - Batch validation entry
+- `error_helper` - Human-readable error explanations and fix hints
+- `config` - Inspect shared configuration and canvas definitions
+- `total_md_split` - Split speaker notes into per-slide note files
 
 ## Reliability Rules
 
-- Prefer canonical commands in this directory over ad-hoc scripts.
-- Prefer `finalize_svg.py` over manually chaining finalizer internals unless debugging a specific stage.
-- Prefer `svg_to_pptx.py -s final` for delivery builds.
+- Prefer the unified command tool over ad-hoc scripts.
+- Prefer the explicit delivery path `total_md_split -> finalize_svg -> svg_to_pptx -s final -> project_manager validate` for release work.
+- Prefer `finalize_svg` over manually chaining finalizer internals unless debugging a specific stage.
+- Prefer `svg_to_pptx -s final` for delivery builds.
+- `svg_to_pptx` auto-splits `notes/total.md` when per-slide notes are missing, but treat that as a fallback rather than the primary delivery path.
+- Treat `project_manager doctor` as the permissive preflight path and `project_manager validate` as the strict delivery gate.
+- `project_manager validate` should only be treated as passing when finalized SVG, note coverage, and an exported `.pptx` are present.
 - Prefer provider smoke tests before relying on a live image setup.
 - Prefer project-local asset paths over remote links in slide content.
 - Prefer generated indexes and manifests to be refreshed by commands instead of manual edits.
@@ -125,6 +145,6 @@ python3 skills/slidemax_workflow/commands/project_manager.py validate workspace/
 
 - [Workflow Rules](../AGENTS.md)
 - [Workflow Index](../workflows/README.md)
-- [Documentation Index](../docs/README.md)
-- [Role Definitions](../roles/README.md)
+- [Image Prompt Guidance](../references/docs/image_prompt_guidance.md)
+- [Role Definitions](../roles/AGENTS.md)
 - [Chart Templates](../templates/charts/README.md)

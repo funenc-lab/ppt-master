@@ -17,6 +17,27 @@ from slidemax.project_management import build_parser, build_preflight_checks, ru
 
 
 class ProjectManagementTestCase(unittest.TestCase):
+    def _create_delivery_ready_project(self, root: Path) -> Path:
+        project = root / "demo_ppt169_20260308"
+        (project / "svg_output").mkdir(parents=True)
+        (project / "svg_final").mkdir()
+        (project / "images").mkdir()
+        (project / "templates").mkdir()
+        (project / "notes").mkdir()
+        (project / "README.md").write_text("# demo\n", encoding="utf-8")
+        (project / "design_specification.md").write_text("# spec\n", encoding="utf-8")
+        (project / "svg_output" / "01_封面.svg").write_text(
+            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720"></svg>',
+            encoding="utf-8",
+        )
+        (project / "svg_final" / "01_封面.svg").write_text(
+            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720"></svg>',
+            encoding="utf-8",
+        )
+        (project / "notes" / "01_封面.md").write_text("hello\n", encoding="utf-8")
+        (project / "demo_ppt169_20260308.pptx").write_bytes(b"pptx")
+        return project
+
     def test_build_parser_accepts_doctor_command(self):
         parser = build_parser()
 
@@ -178,6 +199,42 @@ class ProjectManagementTestCase(unittest.TestCase):
         self.assertEqual(payload["status"], "ok")
         self.assertEqual(payload["project_path"], str(project))
         self.assertTrue(any(check["name"] == "project_structure" for check in payload["checks"]))
+
+    def test_run_cli_validate_fails_when_finalized_svg_missing(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            project = self._create_delivery_ready_project(Path(tmp))
+            (project / "svg_final" / "01_封面.svg").unlink()
+
+            stdout = io.StringIO()
+            with redirect_stdout(stdout):
+                exit_code = run_cli(["validate", str(project)])
+
+        self.assertEqual(exit_code, 1)
+        self.assertIn("svg_final", stdout.getvalue())
+
+    def test_run_cli_validate_fails_when_exported_pptx_missing(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            project = self._create_delivery_ready_project(Path(tmp))
+            (project / "demo_ppt169_20260308.pptx").unlink()
+
+            stdout = io.StringIO()
+            with redirect_stdout(stdout):
+                exit_code = run_cli(["validate", str(project)])
+
+        self.assertEqual(exit_code, 1)
+        self.assertIn(".pptx", stdout.getvalue())
+
+    def test_run_cli_validate_fails_when_slide_notes_are_incomplete(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            project = self._create_delivery_ready_project(Path(tmp))
+            (project / "notes" / "01_封面.md").unlink()
+
+            stdout = io.StringIO()
+            with redirect_stdout(stdout):
+                exit_code = run_cli(["validate", str(project)])
+
+        self.assertEqual(exit_code, 1)
+        self.assertIn("notes", stdout.getvalue().lower())
 
 
 if __name__ == "__main__":

@@ -5,7 +5,8 @@ SlideMax - 错误消息助手
 提供友好的错误消息和具体的修复建议。
 """
 
-from typing import Dict, List, Optional
+import argparse
+from typing import Dict, List, Optional, Sequence
 
 from .svg_rules import build_error_solutions
 
@@ -27,9 +28,9 @@ class ErrorHelper:
         'missing_spec': {
             'message': '缺少设计规范文件',
             'solutions': [
-                '创建 设计规范与内容大纲.md 文件',
-                '包含: 画布规格、配色方案、字体规范、布局规范、内容大纲',
-                '参考 Strategist 角色生成的设计规范'
+                'Create design_specification.md in the project root',
+                'Include canvas spec, color palette, typography, layout guidance, and content outline',
+                'Use the Strategist-generated design specification as the canonical source'
             ],
             'severity': 'warning'
         },
@@ -78,7 +79,7 @@ class ErrorHelper:
                 '确保与项目画布格式一致',
                 'PPT 16:9 应为: viewBox="0 0 1280 720"',
                 'PPT 4:3 应为: viewBox="0 0 1024 768"',
-                '参考: docs/canvas_formats.md'
+                '参考: references/docs/canvas_formats.md'
             ],
             'severity': 'warning'
         },
@@ -241,27 +242,58 @@ class ErrorHelper:
             print("-" * 80)
 
 
-def main():
-    """主函数 - 用于测试"""
-    import sys
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        prog='python3 skills/slidemax_workflow/scripts/slidemax.py error_helper',
+        description='Explain common SlideMax workflow and SVG validation errors.',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog='''
+When to use:
+  - Explain a known repository-specific error with concrete remediation hints
+  - Use `--list-errors` to inspect the supported error catalog before selecting one
 
-    if len(sys.argv) > 1:
-        error_type = sys.argv[1]
-        context = {}
+Examples:
+  %(prog)s missing_spec project_path=workspace/demo_ppt169_20260308
+  %(prog)s viewbox_mismatch expected="0 0 1280 720" actual="0 0 1024 768"
+  %(prog)s --list-errors
+''',
+    )
+    parser.add_argument('error_type', nargs='?', help='Known error type to explain.')
+    parser.add_argument('context_items', nargs='*', help='Optional key=value context items.')
+    parser.add_argument('--list-errors', action='store_true', help='Print the catalog of supported error types.')
+    return parser
 
-        # 解析上下文参数
-        for arg in sys.argv[2:]:
-            if '=' in arg:
-                key, value = arg.split('=', 1)
-                context[key] = value
 
-        print(ErrorHelper.format_error_message(error_type, context))
-    else:
+def parse_context_items(context_items: Sequence[str]) -> Dict[str, str]:
+    context: Dict[str, str] = {}
+    for item in context_items:
+        if '=' in item:
+            key, value = item.split('=', 1)
+            context[key] = value
+    return context
+
+
+def run_cli(argv: Optional[Sequence[str]] = None) -> int:
+    parser = build_parser()
+    args = parser.parse_args(list(argv) if argv is not None else None)
+
+    if args.list_errors or not args.error_type:
         ErrorHelper.print_help()
+        return 0
+
+    context = parse_context_items(args.context_items)
+    print(ErrorHelper.format_error_message(args.error_type, context))
+    return 0
+
+
+def main(argv: Optional[Sequence[str]] = None):
+    """主函数 - 用于测试"""
+
+    raise SystemExit(run_cli(argv))
 
 
 if __name__ == '__main__':
     main()
 
 
-__all__ = ['ErrorHelper', 'main']
+__all__ = ['ErrorHelper', 'build_parser', 'main', 'parse_context_items', 'run_cli']

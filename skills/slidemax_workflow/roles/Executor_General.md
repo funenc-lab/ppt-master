@@ -48,9 +48,9 @@ The Executor stage should leave the project with:
 
 | 上一步 | 当前 | 下一步 |
 |--------|------|--------|
-| Strategist + (Template_Designer) + (Image_Generator) | **Executor**：生成 SVG + 演讲备注 | 后处理 + 导出 PPTX |
+| Strategist + (Template_Designer) + (Image_Generator) | **Executor**：生成 SVG + 演讲备注 | 交付链路 + 项目校验 |
 
-> 📖 完整流程：[generate-ppt.md](../workflows/generate-ppt.md)
+> Full workflow: [AGENTS.md](../AGENTS.md)
 
 ## 模板遵循规则（重要）
 
@@ -176,7 +176,7 @@ The Executor stage should leave the project with:
 | 强调字体 | 黑体               | Arial Black/Consolas |
 | 注释字体 | 微软雅黑/宋体      | Arial/Times          |
 
-详细字体分类参见 [design_guidelines.md](../docs/design_guidelines.md#字体选择)
+详细字体分类参见 [design_guidelines.md](../references/docs/design_guidelines.md#字体选择)
 
 ## PPT 兼容性规则（必须遵守）
 
@@ -207,7 +207,7 @@ The Executor stage should leave the project with:
 <use data-icon="rocket" x="100" y="200" width="48" height="48" fill="#0076A8"/>
 ```
 
-> ⚠️ **无需手动运行** `embed_icons.py`！`finalize_svg.py` 后处理工具会自动嵌入图标。
+> ⚠️ **无需手动运行** `embed_icons`！`finalize_svg` 后处理工具会自动嵌入图标。
 
 **常用图标**：`chart-bar` `arrow-trend-up` `users` `cog` `circle-checkmark` `target` `clock` `file`
 
@@ -266,7 +266,7 @@ The Executor stage should leave the project with:
 
 中心聚焦 x=140,y=140,w=800 | 四象限 480×480
 
-详见 [画布格式规范](../docs/canvas_formats.md)
+详见 [画布格式规范](../references/docs/canvas_formats.md)
 
 ## 生成后自检
 
@@ -337,7 +337,7 @@ The Executor stage should leave the project with:
 **文件命名规范**：
 
 - **推荐**：与 SVG 同名（如 `01_封面.svg` 对应 `notes/01_封面.md`）
-- **兼容**：也支持 `slide01.md` 格式（向后兼容）
+- **兼容读取**：导出阶段也支持 `slide01.md` 格式（向后兼容），但 `total_md_split` 默认按 SVG 文件名写出备注文件
 
 ---
 
@@ -359,16 +359,18 @@ The Executor stage should leave the project with:
 
 > ❌ **禁止**：未输出检查点就进入后处理！如果"逻辑构建阶段"未完成，必须先生成备注。
 
-**后处理与导出**（参见 [generate-ppt.md](../workflows/generate-ppt.md) 阶段八）：
+**Post-processing and export** (see [AGENTS.md](../AGENTS.md), Stage 7):
 
 ```bash
 # 1. 拆分讲稿
-python3 skills/slidemax_workflow/commands/total_md_split.py <项目路径>
+python3 skills/slidemax_workflow/scripts/slidemax.py total_md_split <项目路径>
 
 # 2. SVG 后处理（自动嵌入图标、图片等）
-python3 skills/slidemax_workflow/commands/finalize_svg.py <项目路径>
+python3 skills/slidemax_workflow/scripts/slidemax.py finalize_svg <项目路径>
 
 # 3. 导出 PPTX
-python3 skills/slidemax_workflow/commands/svg_to_pptx.py <项目路径> -s final
-```
+python3 skills/slidemax_workflow/scripts/slidemax.py svg_to_pptx <项目路径> -s final
 
+# 4. 校验项目交付结果
+python3 skills/slidemax_workflow/scripts/slidemax.py project_manager validate <项目路径>
+```

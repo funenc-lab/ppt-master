@@ -147,7 +147,7 @@ open svg_output/slide_01_cover.svg
 kimsoong_customer_loyalty_ppt_20251109/
 ├── README.md                       # 本文件
 ├── 来源文档.md                      # 原始案例资料
-├── 设计规范与内容大纲.md             # 详细设计规范
+├── 设计规范与内容大纲.md             # 示例中保留的历史文件名；当前工作流推荐 design_specification.md
 ├── preview.html                    # 在线预览页面
 └── svg_output/                     # SVG 输出文件
     ├── slide_01_cover.svg
