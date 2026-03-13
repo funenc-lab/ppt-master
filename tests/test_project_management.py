@@ -154,28 +154,38 @@ class ProjectManagementTestCase(unittest.TestCase):
             with mock.patch(
                 "slidemax.project_management.run_preflight_smoke_test",
                 return_value=Path(tmp) / "smoke_test.png",
-            ) as smoke_test_mock:
-                with mock.patch.dict(
-                    os.environ,
-                    {
-                        "DOUBAO_API_KEY": "secret",
-                        "DOUBAO_BASE_URL": "https://doubao.example/api/v3",
-                    },
-                    clear=False,
-                ):
-                    with redirect_stdout(stdout):
-                        exit_code = run_cli(
-                            [
-                                "doctor",
-                                "--provider",
-                                "doubao",
-                                "--model",
-                                "doubao-seedream-5",
-                                "--smoke-test",
-                                "--smoke-output",
-                                tmp,
-                            ]
-                        )
+            ) as smoke_test_mock, mock.patch(
+                "slidemax.project_management.provider_sdk_dependency_status",
+                return_value=(True, "Provider SDK is available."),
+            ), mock.patch(
+                "slidemax.project_management.resolve_provider_config",
+            ) as resolve_provider_config_mock, mock.patch.dict(
+                os.environ,
+                {
+                    "DOUBAO_API_KEY": "secret",
+                    "DOUBAO_BASE_URL": "https://doubao.example/api/v3",
+                },
+                clear=False,
+            ):
+                resolve_provider_config_mock.return_value = mock.Mock(
+                    provider="doubao",
+                    model="doubao-seedream-5",
+                    base_url="https://doubao.example/api/v3",
+                    endpoint=None,
+                )
+                with redirect_stdout(stdout):
+                    exit_code = run_cli(
+                        [
+                            "doctor",
+                            "--provider",
+                            "doubao",
+                            "--model",
+                            "doubao-seedream-5",
+                            "--smoke-test",
+                            "--smoke-output",
+                            tmp,
+                        ]
+                    )
 
         self.assertEqual(exit_code, 0)
         smoke_test_mock.assert_called_once()
@@ -396,6 +406,26 @@ class ProjectManagementTestCase(unittest.TestCase):
 
         self.assertEqual(exit_code, 1)
         self.assertIn("notes", stdout.getvalue().lower())
+
+    def test_run_cli_validate_fails_when_layout_quality_has_overlap_errors(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            project = self._create_delivery_ready_project(Path(tmp))
+            (project / "svg_final" / "01_封面.svg").write_text(
+                (
+                    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720">'
+                    '<text x="120" y="120" font-size="40">Alpha headline</text>'
+                    '<text x="125" y="128" font-size="40">Beta headline</text>'
+                    "</svg>"
+                ),
+                encoding="utf-8",
+            )
+
+            stdout = io.StringIO()
+            with redirect_stdout(stdout):
+                exit_code = run_cli(["validate", str(project)])
+
+        self.assertEqual(exit_code, 1)
+        self.assertIn("layout", stdout.getvalue().lower())
 
 
 if __name__ == "__main__":

@@ -101,6 +101,7 @@ Need to start or continue a PPT task?
 - Always treat exporter auto-split as a fallback, not the primary delivery path.
 - Always finalize SVG before exporting PPTX for delivery.
 - Always run `project_manager validate` before claiming the workflow is complete.
+- Always treat layout overlap, text coverage, and canvas overflow in `svg_final/` as delivery-blocking errors.
 - Always spot check the latest output before saying delivery is done.
 
 # Workflow
@@ -300,6 +301,7 @@ python3 skills/slidemax_workflow/scripts/slidemax.py project_manager validate <p
 
 # Check SVG quality
 python3 skills/slidemax_workflow/scripts/slidemax.py svg_quality_checker <path>
+python3 skills/slidemax_workflow/scripts/slidemax.py layout_quality_checker <path>
 
 # Split notes
 python3 skills/slidemax_workflow/scripts/slidemax.py total_md_split <project-path>

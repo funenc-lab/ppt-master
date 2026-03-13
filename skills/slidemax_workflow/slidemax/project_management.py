@@ -19,6 +19,7 @@ from .image_generation import (
     provider_sdk_dependency_status,
     resolve_provider_config,
 )
+from .layout_quality import LayoutQualityChecker
 from .notes_splitter import parse_total_md
 from .pptx_export import Presentation
 from .project_utils import (
@@ -344,6 +345,46 @@ def _collect_delivery_svg_final_errors(
     return [f'Finalized SVG validation failed: {warning}' for warning in viewbox_warnings]
 
 
+def _collect_delivery_layout_errors(
+    project_path: Path,
+    svg_files: List[Path],
+    *,
+    expected_format: Optional[str],
+) -> List[str]:
+    """Validate finalized slide layout quality for obvious overlap and overflow issues."""
+
+    if not svg_files:
+        return []
+
+    svg_final_dir = project_path / 'svg_final'
+    if not svg_final_dir.exists():
+        return []
+
+    finalized_files = [svg_final_dir / f'{svg_path.stem}.svg' for svg_path in svg_files]
+    existing_files = [path for path in finalized_files if path.exists()]
+    if not existing_files:
+        return []
+
+    checker = LayoutQualityChecker()
+    failed_messages: List[str] = []
+    for svg_file in existing_files:
+        result = checker.check_file(svg_file, expected_format)
+        if result['passed']:
+            continue
+        issue_summary = '; '.join(str(error) for error in result['errors'][:2])
+        failed_messages.append(f'{svg_file.name}: {issue_summary}')
+
+    if not failed_messages:
+        return []
+
+    return [
+        'Layout quality validation failed in svg_final/: '
+        + ' | '.join(failed_messages)
+        + '. Run `python3 skills/slidemax_workflow/scripts/slidemax.py layout_quality_checker <project-path>` '
+        + 'to inspect overlap, coverage, and overflow issues.'
+    ]
+
+
 def _collect_delivery_pptx_errors(project_path: Path, svg_files: List[Path]) -> List[str]:
     """Validate that a PPTX export exists for projects with slide output."""
 
@@ -374,6 +415,13 @@ def _collect_delivery_errors(
     warnings.extend(note_warnings)
     errors.extend(
         _collect_delivery_svg_final_errors(
+            project_path,
+            svg_files,
+            expected_format=expected_format,
+        )
+    )
+    errors.extend(
+        _collect_delivery_layout_errors(
             project_path,
             svg_files,
             expected_format=expected_format,

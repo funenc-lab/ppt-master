@@ -43,6 +43,7 @@ class SlideMaxCliTestCase(unittest.TestCase):
             "gemini_watermark_remover",
             "generate_examples_index",
             "image_generate",
+            "layout_quality_checker",
             "nano_banana_gen",
             "pdf_to_md",
             "project_manager",

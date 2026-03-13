@@ -21,6 +21,7 @@ __all__ = [
     "image_generation",
     "image_source_metadata",
     "image_rotation",
+    "layout_quality",
     "notes_splitter",
     "stock_sources",
     "video_generation",

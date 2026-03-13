@@ -14,34 +14,13 @@ This document describes the SlideMax command surface and points to the canonical
 
 ## Operational Command Quickstart
 
-### End-to-End Command Path
+Workflow stage order, role routing, and delivery gates live in [AGENTS.md](../../AGENTS.md).
+This document only maps immediate operational tasks to the canonical commands.
+
+### Command Task Map
 
 ```text
-Start a PPT workflow task
-  -> Normalize source
-     -> PDF: `pdf_to_md`
-     -> URL: `web_to_md` or `web_to_md_cjs`
-     -> Screenshot/image document: OCR skill `.agent/skills/ocr_image_to_markdown/SKILL.md`
-     -> Markdown/Text: use directly
-  -> Create project: `project_manager init`
-  -> Inspect workflow stage progression when needed: `project_manager audit`
-  -> Produce strategy and role outputs
-  -> Acquire images when needed
-     -> User-supplied image analysis: `analyze_images`
-     -> AI image: `image_generate`
-     -> Provider smoke test: `smoke_test_image_provider`
-     -> Stock image: `download_stock_image` / `register_stock_image`
-     -> Provenance and risk audit: `register_image_source` / `audit_image_asset`
-  -> Split notes explicitly: `total_md_split`
-  -> Finalize SVG: `finalize_svg`
-  -> Export PPTX: `svg_to_pptx -s final`
-  -> Validate delivery: `project_manager validate` or `batch_validate`
-```
-
-### Command Decision Flow
-
-```text
-What is the immediate task?
+What is the immediate command-level task?
 |
 +-- Convert source material ----------------> `pdf_to_md` / `web_to_md` / `web_to_md_cjs`
 +-- Transcribe screenshots / image docs ---> OCR skill `.agent/skills/ocr_image_to_markdown/SKILL.md`
@@ -54,7 +33,7 @@ What is the immediate task?
 +-- Split notes before delivery -----------> `total_md_split`
 +-- Fix or finalize SVG -------------------> `finalize_svg`
 +-- Export PPTX ---------------------------> `svg_to_pptx -s final`
-+-- Diagnose quality ----------------------> `svg_quality_checker` / `batch_validate` / `error_helper`
++-- Diagnose quality ----------------------> `svg_quality_checker` / `layout_quality_checker` / `batch_validate` / `error_helper`
 +-- Install export environment -----------> `setup_export_env`
 ```
 
@@ -125,6 +104,7 @@ python3 skills/slidemax_workflow/scripts/slidemax.py project_manager validate wo
 
 - `svg_to_pptx` - Export SVG slides to PPTX
 - `svg_quality_checker` - Validate SVG compliance and detect compatibility issues
+- `layout_quality_checker` - Detect text overlap, text coverage, and canvas overflow in finalized slides
 - `batch_validate` - Batch validation entry
 - `error_helper` - Human-readable error explanations and fix hints
 - `config` - Inspect shared configuration and canvas definitions
@@ -140,7 +120,7 @@ python3 skills/slidemax_workflow/scripts/slidemax.py project_manager validate wo
 - `svg_to_pptx` auto-splits `notes/total.md` when per-slide notes are missing, but treat that as a fallback rather than the primary delivery path.
 - Treat `project_manager doctor` as the permissive preflight path and `project_manager validate` as the strict delivery gate.
 - Treat `project_manager audit` as the stage-consistency check for in-progress projects.
-- `project_manager validate` should only be treated as passing when finalized SVG, note coverage, and an exported `.pptx` are present.
+- `project_manager validate` should only be treated as passing when finalized SVG, note coverage, an exported `.pptx`, and layout quality checks all pass.
 - Prefer provider smoke tests before relying on a live image setup.
 - Prefer project-local asset paths over remote links in slide content.
 - Prefer generated indexes and manifests to be refreshed by commands instead of manual edits.

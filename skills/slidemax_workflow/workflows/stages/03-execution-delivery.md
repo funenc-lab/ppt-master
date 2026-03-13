@@ -80,6 +80,7 @@ Validation expectations:
 - `svg_final/` contains the finalized slide set.
 - Notes cover every slide through per-slide files or a complete `notes/total.md`.
 - An exported `.pptx` exists in the project root.
+- Finalized slides pass layout checks for overlap, text coverage, and canvas overflow.
 
 Minimum spot check:
 

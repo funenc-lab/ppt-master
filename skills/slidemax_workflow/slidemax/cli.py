@@ -316,6 +316,12 @@ def build_registry() -> Dict[str, CommandSpec]:
             runner=_build_run_cli_runner("slidemax.svg_quality"),
         ),
         CommandSpec(
+            name="layout_quality_checker",
+            summary="Detect layout overlap, coverage, and overflow in finalized SVG slides.",
+            category="Export and Validation",
+            runner=_build_run_cli_runner("slidemax.layout_quality"),
+        ),
+        CommandSpec(
             name="batch_validate",
             summary="Validate multiple SlideMax outputs in one pass.",
             category="Export and Validation",
